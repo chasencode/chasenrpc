@@ -23,18 +23,23 @@ public class ProviderBootstrap implements ApplicationContextAware {
     ApplicationContext applicationContext;
 
     public RpcResponse invokeRequest(RpcRequest request) {
+        RpcResponse rpcResponse = new RpcResponse();
         Object bean = skeleton.get(request.getService());
         try {
             Method method = findMethod(bean.getClass(), request.getMethod());
             Object result = method.invoke(bean, request.getArgs());
-            return new RpcResponse(true, result);
+            rpcResponse.setStatus(true);
+            rpcResponse.setData(result);
         } catch (InvocationTargetException e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            // 不想给客户端暴露服务端的堆栈信息，所以只需要返回 execption msg 就可以了
+            // 反射目标一场 需要拿到目标信息的一场
+            rpcResponse.setEx(new RuntimeException(e.getTargetException().getMessage()));
+
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            throw new RuntimeException();
+            rpcResponse.setEx(new RuntimeException(e.getMessage()));
         }
+        return rpcResponse;
     }
 
     private Method findMethod(Class<?> aClass, String methodName) {
