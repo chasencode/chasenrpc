@@ -6,17 +6,16 @@ import demo.api.RpcResponse;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import meta.ProviderMeta;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import util.MethodUtils;
+import util.TypeUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +38,8 @@ public class ProviderBootstrap implements ApplicationContextAware {
                 throw new RuntimeException(request.getService() + " not find");
             }
             Method method = meta.getMethod();
-            Object result = method.invoke(meta.getServiceImpl(), request.getArgs());
+            Object[] args = processArgs(request.getArgs(), method.getParameterTypes());
+            Object result = method.invoke(meta.getServiceImpl(), args);
             rpcResponse.setStatus(true);
             rpcResponse.setData(result);
         } catch (InvocationTargetException e) {
@@ -52,6 +52,17 @@ public class ProviderBootstrap implements ApplicationContextAware {
             rpcResponse.setEx(new RuntimeException(e.getMessage()));
         }
         return rpcResponse;
+    }
+
+    private Object[] processArgs(Object[] args, Class<?>[] parameterTypes) {
+        if (args == null || args.length == 0) {
+            return args;
+        }
+        Object[] actuals = new Object[args.length];
+        for (int i = 0; i < args.length; i++) {
+            actuals[i] = TypeUtils.cast(args[i], parameterTypes[i]);
+        }
+        return actuals;
     }
 
     private ProviderMeta findProviderMeta(List<ProviderMeta> providerMetaList, String methodSign) {
@@ -75,14 +86,15 @@ public class ProviderBootstrap implements ApplicationContextAware {
 
     private void getInterface(Object beanObject) {
         // 拿到接口的全限定的名字和实现类
-        Class<?> anInterface = beanObject.getClass().getInterfaces()[0];
-        Method[] methods = anInterface.getMethods();
-        for (Method method : methods) {
-            if (MethodUtils.checkLocalMethod(method)) {
-                continue;
+        Arrays.stream(beanObject.getClass().getInterfaces()).forEach(anInterface -> {
+            Method[] methods = anInterface.getMethods();
+            for (Method method : methods) {
+                if (MethodUtils.checkLocalMethod(method)) {
+                    continue;
+                }
+                createProvider(anInterface, beanObject, method);
             }
-            createProvider(anInterface, beanObject, method);
-        }
+        });
     }
 
     private void createProvider(Class<?> anInterface, Object beanObject, Method method) {
