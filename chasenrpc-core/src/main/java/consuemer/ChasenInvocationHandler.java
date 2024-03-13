@@ -1,6 +1,5 @@
 package consuemer;
 
-import ch.qos.logback.core.util.TimeUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import demo.api.RpcRequest;
@@ -14,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.ConnectionPool;
 import okhttp3.MediaType;
 import okhttp3.*;
+import util.MethodUtils;
 
 public class ChasenInvocationHandler implements InvocationHandler {
 
@@ -30,7 +30,7 @@ public class ChasenInvocationHandler implements InvocationHandler {
 
         RpcRequest request = new RpcRequest();
         request.setService(service.getCanonicalName());
-        request.setMethod(method.getName());
+        request.setMethodSign(MethodUtils.methodSign(method));
         request.setArgs(args);
 
         RpcResponse rpcResponse = post(request);

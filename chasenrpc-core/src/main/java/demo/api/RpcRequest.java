@@ -7,7 +7,7 @@ public class RpcRequest {
 
     private String service; // 接口
 
-    private String method; // 方法 findById
+    private String methodSign; // 方法签名
 
     private Object[] args; // 参数 100
 }

@@ -37,6 +37,8 @@ public class ChasenDemoConsumerApplication {
             System.out.printf("这里");
             User user = userService.findById(1);
             System.out.println("RPC result userService.findById(1) = " + user);
+            User user2 = userService.findById(1, "Chasen");
+            System.out.println("RPC result userService.findById(1) = " + user2);
             demo2.test();
 //            Order order404 = orderService.findById(404);
 //            System.out.println("RPC result orderService.findById(2) = " + order404);

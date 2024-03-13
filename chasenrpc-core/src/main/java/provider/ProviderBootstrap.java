@@ -5,29 +5,41 @@ import demo.api.RpcRequest;
 import demo.api.RpcResponse;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
-import org.springframework.beans.BeansException;
+import meta.ProviderMeta;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import util.MethodUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-@Component
 @Data
 public class ProviderBootstrap implements ApplicationContextAware {
-    @Autowired
+
     ApplicationContext applicationContext;
 
+    private MultiValueMap<String, ProviderMeta> skeleton = new LinkedMultiValueMap<>();
+
     public RpcResponse invokeRequest(RpcRequest request) {
+        String methodSign = request.getMethodSign();
+        List<ProviderMeta> providerMetaList = skeleton.get(request.getService());
+
         RpcResponse rpcResponse = new RpcResponse();
-        Object bean = skeleton.get(request.getService());
         try {
-            Method method = findMethod(bean.getClass(), request.getMethod());
-            Object result = method.invoke(bean, request.getArgs());
+
+            ProviderMeta meta = findProviderMeta(providerMetaList, methodSign);
+            if (meta == null) {
+                throw new RuntimeException(request.getService() + " not find");
+            }
+            Method method = meta.getMethod();
+            Object result = method.invoke(meta.getServiceImpl(), request.getArgs());
             rpcResponse.setStatus(true);
             rpcResponse.setData(result);
         } catch (InvocationTargetException e) {
@@ -42,21 +54,15 @@ public class ProviderBootstrap implements ApplicationContextAware {
         return rpcResponse;
     }
 
-    private Method findMethod(Class<?> aClass, String methodName) {
-        for (Method method : aClass.getMethods()) {
-            if (methodName.equals(method.getName())) {
-                return method;
-            }
-        }
-        return null;
+    private ProviderMeta findProviderMeta(List<ProviderMeta> providerMetaList, String methodSign) {
+        return providerMetaList.stream().filter(
+                x -> x.getMethodSign().equals(methodSign)
+        ).findFirst().orElse(null);
     }
 
 
-
-    private Map<String, Object> skeleton = new HashMap<>();
-
     @PostConstruct
-    public void buildProviders() {
+    public void start() {
         // 获取所有使用这个注解的bean
         Map<String, Object> providers = applicationContext.getBeansWithAnnotation(ChasenProvider.class);
         providers.forEach((String beanName, Object beanObject) -> System.out.println(beanName));
@@ -70,7 +76,21 @@ public class ProviderBootstrap implements ApplicationContextAware {
     private void getInterface(Object beanObject) {
         // 拿到接口的全限定的名字和实现类
         Class<?> anInterface = beanObject.getClass().getInterfaces()[0];
-        // 这里要 改成多个接口类的实现
-        skeleton.put(anInterface.getCanonicalName(), beanObject);
+        Method[] methods = anInterface.getMethods();
+        for (Method method : methods) {
+            if (MethodUtils.checkLocalMethod(method)) {
+                continue;
+            }
+            createProvider(anInterface, beanObject, method);
+        }
+    }
+
+    private void createProvider(Class<?> anInterface, Object beanObject, Method method) {
+        ProviderMeta meta = new ProviderMeta();
+        meta.setMethodSign(MethodUtils.methodSign(method));
+        meta.setServiceImpl(beanObject);
+        meta.setMethod(method);
+        System.out.printf(" create a provider: " + meta);
+        skeleton.add(anInterface.getCanonicalName(), meta);
     }
 }

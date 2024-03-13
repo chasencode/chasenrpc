@@ -38,10 +38,18 @@ public class ChasenDemoProviderApplication {
         return x -> {
             RpcRequest request = new RpcRequest();
             request.setService("demo.api.UserService");
-            request.setMethod("findById");
+            request.setMethodSign("findById@1_int");
             request.setArgs(new Object[]{100});
             RpcResponse rpcResponse = providerBootstrap.invokeRequest(request);
-            System.out.printf("return:" + rpcResponse.getData());
+            System.out.println("return:" + rpcResponse.getData());
+
+
+            RpcRequest request2 = new RpcRequest();
+            request2.setService("demo.api.UserService");
+            request2.setMethodSign("findById@2_int_java.long.long.String");
+            request2.setArgs(new Object[]{101, "Chasen"});
+            RpcResponse rpcResponse2 = providerBootstrap.invokeRequest(request);
+            System.out.println("return2:" + rpcResponse2.getData());
         };
     }
 }
