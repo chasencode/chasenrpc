@@ -33,6 +33,8 @@ public class  ProviderBootstrap implements ApplicationContextAware {
 
     private String instance;
 
+    private RegistryCenter rc;
+
     @Value("${server.port}")
     private String port;
 
@@ -88,7 +90,7 @@ public class  ProviderBootstrap implements ApplicationContextAware {
         Map<String, Object> providers = applicationContext.getBeansWithAnnotation(ChasenProvider.class);
         providers.forEach((String beanName, Object beanObject) -> System.out.println(beanName));
 //        skeleton.putAll(providers);
-
+        rc = applicationContext.getBean(RegistryCenter.class);
         providers.values().forEach(
                 this::getInterface
         );
@@ -107,17 +109,18 @@ public class  ProviderBootstrap implements ApplicationContextAware {
 
     @PreDestroy
     public void stop() {
+        System.out.printf("客户端关闭");
         skeleton.keySet().forEach(this::unregisterService);
     }
 
     private void registerService(String service) {
-        final RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
+//        final RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
         rc.register(service, instance);
     }
 
 
     private void unregisterService(String service) {
-        final RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
+//        final RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
         rc.unregister(service, instance);
     }
 
