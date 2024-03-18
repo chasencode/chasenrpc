@@ -1,5 +1,6 @@
 package consuemer;
 
+import api.RpcContext;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -11,6 +12,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.ConnectionPool;
@@ -25,8 +27,13 @@ public class ChasenInvocationHandler implements InvocationHandler {
 
     private Class<?> service;
 
-    public ChasenInvocationHandler(Class<?> clazz) {
+    private RpcContext context;
+    private List<String> providers;
+
+    public ChasenInvocationHandler(Class<?> clazz, RpcContext context, List<String> providers) {
         this.service = clazz;
+        this.context = context;
+        this.providers = providers;
     }
 
     @Override
@@ -37,7 +44,11 @@ public class ChasenInvocationHandler implements InvocationHandler {
         request.setMethodSign(MethodUtils.methodSign(method));
         request.setArgs(args);
 
-        RpcResponse rpcResponse = post(request);
+        List<String> urls = context.getRouter().route(providers);
+        String url = (String) context.getLoadBalancer().choose(urls);
+        System.out.println("loadBalancer.choose(urls) ==> " + url);
+
+        RpcResponse rpcResponse = post(request, url);
         if (rpcResponse.isStatus()) {
             Object data = rpcResponse.getData();
             if (data instanceof JSONObject jsonObject) {
@@ -66,13 +77,13 @@ public class ChasenInvocationHandler implements InvocationHandler {
 //        return null;
     }
     // 可以改为 Gson
-    private RpcResponse post(RpcRequest rpcRequest) {
+    private RpcResponse post(RpcRequest rpcRequest, String url) {
 
         try {
             String requestJson = JSON.toJSONString(rpcRequest);
             System.out.println(" ===> reqJson = " + requestJson);
             Request request = new Request.Builder()
-                    .url("http://127.0.0.1:8080")
+                    .url(url)
                     .post(RequestBody.create(requestJson, JSONTYPE))
                     .build();
             String respJson = client.newCall(request).execute().body().string();

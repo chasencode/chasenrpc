@@ -12,10 +12,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 @Import({ConsumerConfig.class})
+@RestController
 public class ChasenDemoConsumerApplication {
 
     @ChasenConsumer
@@ -23,6 +25,11 @@ public class ChasenDemoConsumerApplication {
 
     @ChasenConsumer
     OrderService orderService;
+
+    @RequestMapping("/")
+    public User findBy(int id) {
+        return userService.findById(id);
+    }
 
     @Autowired
     Demo2 demo2;

@@ -7,8 +7,5 @@ Content-Type: application/json
   "args": [100]
 }
 
-//{
-//  "service":"demo.api.UserService",
-//  "methodSign":"findById@2_int_java.long.long.String",
-//  "args": [100,"Chasen"]
-//}
+### 获取8088用户信息
+GET http://127.0.0.1:8088/?id=101

@@ -2,13 +2,21 @@ package consuemer;
 
 import annotation.ChasenConsumer;
 import annotation.ChasenProvider;
+import api.LoadBalancer;
+import api.RegistryCenter;
+import api.Router;
+import api.RpcContext;
+import cluster.RoundRibonLoadBalancer;
 import demo.api.RpcRequest;
 import demo.api.RpcResponse;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
+import lombok.val;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -28,8 +36,21 @@ public class ConsumerBootstrap implements ApplicationContextAware {
 
     private Map<String, Object> stub = new HashMap<>();
 
+    Environment environment;
+
 
     public void start() {
+
+        Router router = applicationContext.getBean(Router.class);
+        LoadBalancer loadBalancer = applicationContext.getBean(RoundRibonLoadBalancer.class);
+
+        RpcContext context = new RpcContext();
+        context.setRouter(router);
+        context.setLoadBalancer(loadBalancer);
+
+
+        RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
+
         String[] beanDefinitionNames = applicationContext.getBeanDefinitionNames();
         for (String beanDefinitionName : beanDefinitionNames) {
             Object bean = applicationContext.getBean(beanDefinitionName);
@@ -45,7 +66,8 @@ public class ConsumerBootstrap implements ApplicationContextAware {
                     String serviceName = service.getCanonicalName();
                     Object consumer = stub.get(serviceName);
                     if (consumer == null) {
-                        consumer = createConsumer(service);
+//                        consumer = createConsumer(service, context, List.of(providers));
+                        consumer = createFromRegistry(service, context, rc);
                     }
                     filed.setAccessible(true);
                     filed.set(bean, consumer);
@@ -57,12 +79,17 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         }
     }
 
-    private Object createConsumer(Class<?> service) {
+    private Object createFromRegistry(Class<?> service, RpcContext context, RegistryCenter rc) {
+        String serviceName = service.getCanonicalName();
+        List<String> providers = rc.fetchAll(serviceName);
+        return createConsumer(service, context, providers);
+    }
 
+    private Object createConsumer(Class<?> service, RpcContext context, List<String> providers) {
         return Proxy.newProxyInstance(
                 service.getClassLoader(),
                 new Class[]{service},
-                new ChasenInvocationHandler(service)
+                new ChasenInvocationHandler(service, context, providers)
         );
     }
 
