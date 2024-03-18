@@ -4,9 +4,11 @@ import api.RegistryCenter;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 
+import javax.swing.event.ChangeListener;
 import java.util.List;
 
 public class ZkRegistryCenter implements RegistryCenter {
@@ -68,9 +70,37 @@ public class ZkRegistryCenter implements RegistryCenter {
     }
 
     @Override
-    public List<String> fetchAll(String service) {
-//        System.out.println(" ===> fetchAll from zk: " + servicePath);
+    public void subscribe(String service, ChangedListener listener) {
 
-        return null;
+        try {
+            final TreeCache cache = TreeCache.newBuilder(client, "/"+service)
+                    .setCacheData(true).setMaxDepth(2).build();
+            cache.getListenable().addListener(
+                    (curator, event) -> {
+                        // 有任何节点变动这里会执行
+                        System.out.println("zk subscribe event: " + event);
+                        List<String> nodes = fetchAll(service);
+                        listener.fire(new Event(nodes));
+                    }
+            );
+            cache.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<String> fetchAll(String service) {
+        String servicePath = "/" + service;
+        try {
+            System.out.println(" ===> fetchAll from zk: " + servicePath);
+            final List<String> nodes = client.getChildren().forPath(servicePath);
+            nodes.forEach(System.out::println);
+            return nodes;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 }

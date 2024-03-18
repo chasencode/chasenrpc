@@ -18,6 +18,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import registry.ChangedListener;
+import registry.Event;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
 public class ConsumerBootstrap implements ApplicationContextAware {
@@ -81,9 +84,18 @@ public class ConsumerBootstrap implements ApplicationContextAware {
 
     private Object createFromRegistry(Class<?> service, RpcContext context, RegistryCenter rc) {
         String serviceName = service.getCanonicalName();
-        List<String> providers = rc.fetchAll(serviceName);
+        List<String> providers = mapUrls(rc.fetchAll(serviceName));
+        System.out.printf("===》 map to provider");
+        providers.forEach(System.out::println);
+
+        rc.subscribe(serviceName, event -> {
+            providers.clear();
+            providers.addAll(mapUrls(event.getData()));
+        });
+
         return createConsumer(service, context, providers);
     }
+
 
     private Object createConsumer(Class<?> service, RpcContext context, List<String> providers) {
         return Proxy.newProxyInstance(
@@ -91,6 +103,11 @@ public class ConsumerBootstrap implements ApplicationContextAware {
                 new Class[]{service},
                 new ChasenInvocationHandler(service, context, providers)
         );
+    }
+
+    private List<String> mapUrls(List<String> nodes) {
+        return nodes.stream()
+                .map(x -> "http://" + x.replace('_', ':')).collect(Collectors.toList());
     }
 
     private List<Field> findAnnotatedField(Class<?> aClass) {

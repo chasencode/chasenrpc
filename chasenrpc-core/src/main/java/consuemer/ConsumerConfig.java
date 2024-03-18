@@ -11,6 +11,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import registry.ZkRegistryCenter;
 
 import java.util.List;
 
@@ -53,6 +54,6 @@ public class ConsumerConfig {
 
     @Bean(initMethod = "start", destroyMethod = "stop")
     public RegistryCenter consumerRc() {
-        return new RegistryCenter.StaticRegistryCenter(List.of(servers.split(",")));
+        return new ZkRegistryCenter();
     }
 }
