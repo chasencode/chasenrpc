@@ -1,11 +1,14 @@
 package provider;
 
 import annotation.ChasenProvider;
+import api.RegistryCenter;
 import demo.api.RpcRequest;
 import demo.api.RpcResponse;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.Data;
 import meta.ProviderMeta;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.LinkedMultiValueMap;
@@ -15,16 +18,23 @@ import util.TypeUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 @Data
-public class ProviderBootstrap implements ApplicationContextAware {
+public class  ProviderBootstrap implements ApplicationContextAware {
 
     ApplicationContext applicationContext;
 
     private MultiValueMap<String, ProviderMeta> skeleton = new LinkedMultiValueMap<>();
+
+    private String instance;
+
+    @Value("${server.port}")
+    private String port;
 
     public RpcResponse invokeRequest(RpcRequest request) {
         String methodSign = request.getMethodSign();
@@ -73,7 +83,7 @@ public class ProviderBootstrap implements ApplicationContextAware {
 
 
     @PostConstruct
-    public void start() {
+    public void init() {
         // 获取所有使用这个注解的bean
         Map<String, Object> providers = applicationContext.getBeansWithAnnotation(ChasenProvider.class);
         providers.forEach((String beanName, Object beanObject) -> System.out.println(beanName));
@@ -82,6 +92,33 @@ public class ProviderBootstrap implements ApplicationContextAware {
         providers.values().forEach(
                 this::getInterface
         );
+
+    }
+    public void start() {
+        try {
+            String ip = InetAddress.getLocalHost().getHostAddress();
+            instance = ip + "_" +port;
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        skeleton.keySet().forEach(this::registerService); // zk有了， 但spring 还未注册完成
+    }
+
+    @PreDestroy
+    public void stop() {
+        skeleton.keySet().forEach(this::unregisterService);
+    }
+
+    private void registerService(String service) {
+        final RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
+        rc.register(service, instance);
+    }
+
+
+    private void unregisterService(String service) {
+        final RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
+        rc.unregister(service, instance);
     }
 
     private void getInterface(Object beanObject) {
