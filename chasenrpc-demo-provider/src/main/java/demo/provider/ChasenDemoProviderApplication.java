@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import provider.ProviderBootstrap;
 import provider.ProviderConfig;
+import provider.ProviderInvoker;
 
 @SpringBootApplication
 @RestController
@@ -20,7 +21,7 @@ import provider.ProviderConfig;
 public class ChasenDemoProviderApplication {
 
     @Autowired
-    ProviderBootstrap providerBootstrap;
+    ProviderInvoker providerInvoker;
 
     public static void main(String[] args) {
         SpringApplication.run(ChasenDemoProviderApplication.class, args);
@@ -29,8 +30,8 @@ public class ChasenDemoProviderApplication {
 
 
     @RequestMapping("/")
-    public RpcResponse invoke(@RequestBody RpcRequest request) {
-        return  providerBootstrap.invokeRequest(request);
+    public RpcResponse<Object> invoke(@RequestBody RpcRequest request) {
+        return  providerInvoker.invoke(request);
     }
 
     @Bean
@@ -40,15 +41,14 @@ public class ChasenDemoProviderApplication {
             request.setService("demo.api.UserService");
             request.setMethodSign("findById@1_int");
             request.setArgs(new Object[]{100});
-            RpcResponse rpcResponse = providerBootstrap.invokeRequest(request);
+            RpcResponse<Object> rpcResponse = providerInvoker.invoke(request);
             System.out.println("return:" + rpcResponse.getData());
-
 
             RpcRequest request2 = new RpcRequest();
             request2.setService("demo.api.UserService");
             request2.setMethodSign("findById@2_int_java.long.long.String");
             request2.setArgs(new Object[]{101, "Chasen"});
-            RpcResponse rpcResponse2 = providerBootstrap.invokeRequest(request);
+            RpcResponse<Object> rpcResponse2 = providerInvoker.invoke(request);
             System.out.println("return2:" + rpcResponse2.getData());
         };
     }
