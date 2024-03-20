@@ -41,7 +41,7 @@ public class ChasenInvocationHandler implements InvocationHandler {
 
         List<InstanceMeta> instanceMetaList = context.getRouter().route(providers);
         InstanceMeta InstanceMeta = context.getLoadBalancer().choose(instanceMetaList);
-        String url = InstanceMeta.toString();
+        String url = InstanceMeta.toUrl();
         System.out.println("loadBalancer.choose(urls) ==> " + url);
         RpcResponse<?> rpcResponse = httpInvoker.post(request, url);
         if (rpcResponse.isStatus()) {

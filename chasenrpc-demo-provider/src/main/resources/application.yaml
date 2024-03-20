@@ -1,2 +1,10 @@
 server:
   port: 8081
+rpc:
+  zkServer: localhost:2181
+  zkRoot: rpc
+
+app:
+  id: app1
+  namespace: public
+  env: dev

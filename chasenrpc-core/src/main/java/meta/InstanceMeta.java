@@ -35,6 +35,7 @@ public class InstanceMeta {
     }
 
     public String toUrl() {
-        return String.format("%s://%s:%s_%d", scheme, host, port, context);
+        return String.format("%s://%s:%d/%s", scheme, host, port, context);
     }
+
 }

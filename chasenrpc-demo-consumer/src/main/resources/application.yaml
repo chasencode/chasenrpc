@@ -3,3 +3,13 @@ server:
 
 chasenrpc:
   providers: http://127.0.0.1:8081,http://127.0.0.1:8082
+
+
+rpc:
+  zkServer: localhost:2181
+  zkRoot: rpc
+
+app:
+  id: app1
+  namespace: public
+  env: dev

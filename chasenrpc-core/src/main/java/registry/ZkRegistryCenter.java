@@ -2,6 +2,7 @@ package registry;
 
 import api.RegistryCenter;
 import meta.InstanceMeta;
+import meta.ServiceMeta;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -37,7 +38,7 @@ public class ZkRegistryCenter implements RegistryCenter {
     }
 
     @Override
-    public void register(String service, InstanceMeta instance) {
+    public void register(ServiceMeta service, InstanceMeta instance) {
         String servicePath = "/" + service;
         try {
             // 创建服务的持久化节点
@@ -55,7 +56,7 @@ public class ZkRegistryCenter implements RegistryCenter {
     }
 
     @Override
-    public void unregister(String service, InstanceMeta instance) {
+    public void unregister(ServiceMeta service, InstanceMeta instance) {
         String servicePath = "/" + service;
         try {
             // 创建服务的持久化节点
@@ -73,7 +74,7 @@ public class ZkRegistryCenter implements RegistryCenter {
     }
 
     @Override
-    public void subscribe(String service, ChangedListener listener) {
+    public void subscribe(ServiceMeta service, ChangedListener listener) {
 
         try {
             final TreeCache cache = TreeCache.newBuilder(client, "/" + service)
@@ -94,7 +95,7 @@ public class ZkRegistryCenter implements RegistryCenter {
     }
 
     @Override
-    public List<InstanceMeta> fetchAll(String service) {
+    public List<InstanceMeta> fetchAll(ServiceMeta service) {
         String servicePath = "/" + service;
         try {
             System.out.println(" ===> fetchAll from zk: " + servicePath);

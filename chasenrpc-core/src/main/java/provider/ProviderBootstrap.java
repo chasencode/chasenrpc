@@ -9,6 +9,7 @@ import jakarta.annotation.PreDestroy;
 import lombok.Data;
 import meta.InstanceMeta;
 import meta.ProviderMeta;
+import meta.ServiceMeta;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -38,6 +39,15 @@ public class  ProviderBootstrap implements ApplicationContextAware {
 
     @Value("${server.port}")
     private String port;
+
+    @Value("${app.id}")
+    private String app;
+
+    @Value("${app.namespace}")
+    private String namespace;
+
+    @Value("${app.env}")
+    private String env;
 
 
 
@@ -73,12 +83,16 @@ public class  ProviderBootstrap implements ApplicationContextAware {
     }
 
     private void registerService(String service) {
-        rc.register(service, instance);
+        ServiceMeta serviceMeta = ServiceMeta.builder()
+                .app(app).namespace(namespace).env(env).name(service).build();
+        rc.register(serviceMeta, instance);
     }
 
 
     private void unregisterService(String service) {
-        rc.unregister(service, instance);
+        ServiceMeta serviceMeta = ServiceMeta.builder()
+                .app(app).namespace(namespace).env(env).name(service).build();
+        rc.unregister(serviceMeta, instance);
     }
 
     private void getInterface(Object beanObject) {

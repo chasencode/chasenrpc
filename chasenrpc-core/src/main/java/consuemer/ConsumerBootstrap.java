@@ -7,6 +7,8 @@ import api.RpcContext;
 import cluster.RoundRibonLoadBalancer;
 import lombok.Data;
 import meta.InstanceMeta;
+import meta.ServiceMeta;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.env.Environment;
@@ -32,6 +34,15 @@ public class ConsumerBootstrap implements ApplicationContextAware {
 
     Environment environment;
 
+    @Value("${app.id}")
+    private String app;
+
+    @Value("${app.namespace}")
+    private String namespace;
+
+    @Value("${app.env}")
+    private String env;
+
 
     public void start() {
 
@@ -41,18 +52,12 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         RpcContext context = new RpcContext();
         context.setRouter(router);
         context.setLoadBalancer(loadBalancer);
-
-
         RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
-
         String[] beanDefinitionNames = applicationContext.getBeanDefinitionNames();
         for (String beanDefinitionName : beanDefinitionNames) {
             Object bean = applicationContext.getBean(beanDefinitionName);
             // 这里获取到了 CGlib 增强提升的子类
             List<Field> fieldList = FiledUtils.findAnnotatedField(bean.getClass(), ChasenConsumer.class);
-
-//            if (beanDefinitionName.contains("chasenrpcDemoConsumerApplication")) return;
-
             fieldList.stream().forEach(filed -> {
                 System.out.printf("===> " + filed.getName());
                 try {
@@ -75,12 +80,13 @@ public class ConsumerBootstrap implements ApplicationContextAware {
     }
 
     private Object createFromRegistry(Class<?> service, RpcContext context, RegistryCenter rc) {
-        String serviceName = service.getCanonicalName();
-        List<InstanceMeta> providers = rc.fetchAll(serviceName);
+        ServiceMeta serviceMeta = ServiceMeta.builder()
+                .app(app).namespace(namespace).env(env).name(service.getCanonicalName()).build();
+        List<InstanceMeta> providers = rc.fetchAll(serviceMeta);
         System.out.printf("===》 map to provider");
         providers.forEach(System.out::println);
 
-        rc.subscribe(serviceName, event -> {
+        rc.subscribe(serviceMeta, event -> {
             providers.clear();
             providers.addAll(event.getData());
         });
