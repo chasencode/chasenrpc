@@ -20,6 +20,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import registry.ChangedListener;
 import registry.Event;
+import util.FiledUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -45,7 +46,7 @@ public class ConsumerBootstrap implements ApplicationContextAware {
     public void start() {
 
         Router router = applicationContext.getBean(Router.class);
-        LoadBalancer loadBalancer = applicationContext.getBean(RoundRibonLoadBalancer.class);
+        RoundRibonLoadBalancer loadBalancer = applicationContext.getBean(RoundRibonLoadBalancer.class);
 
         RpcContext context = new RpcContext();
         context.setRouter(router);
@@ -58,7 +59,7 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         for (String beanDefinitionName : beanDefinitionNames) {
             Object bean = applicationContext.getBean(beanDefinitionName);
             // 这里获取到了 CGlib 增强提升的子类
-            List<Field> fieldList = findAnnotatedField(bean.getClass());
+            List<Field> fieldList = FiledUtils.findAnnotatedField(bean.getClass(), ChasenConsumer.class);
 
 //            if (beanDefinitionName.contains("chasenrpcDemoConsumerApplication")) return;
 
@@ -110,18 +111,5 @@ public class ConsumerBootstrap implements ApplicationContextAware {
                 .map(x -> "http://" + x.replace('_', ':')).collect(Collectors.toList());
     }
 
-    private List<Field> findAnnotatedField(Class<?> aClass) {
-        List<Field> result = new ArrayList<>();
-        while (aClass != null) {
-            Field[] fields = aClass.getDeclaredFields();
-            for (Field field : fields) {
-                if (field.isAnnotationPresent(ChasenConsumer.class)) {
-                    result.add(field);
-                }
-            }
-            aClass = aClass.getSuperclass();
-        }
-        return result;
 
-    }
 }

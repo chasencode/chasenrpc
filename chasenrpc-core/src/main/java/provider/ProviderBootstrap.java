@@ -100,7 +100,7 @@ public class  ProviderBootstrap implements ApplicationContextAware {
         meta.setMethodSign(MethodUtils.methodSign(method));
         meta.setServiceImpl(beanObject);
         meta.setMethod(method);
-        System.out.printf(" create a provider: " + meta);
+        System.out.print(" create a provider: " + meta);
         skeleton.add(anInterface.getCanonicalName(), meta);
     }
 }
