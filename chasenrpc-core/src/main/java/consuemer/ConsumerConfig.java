@@ -4,16 +4,14 @@ import api.LoadBalancer;
 import api.RegistryCenter;
 import api.Router;
 import cluster.RoundRibonLoadBalancer;
-import consuemer.ConsumerBootstrap;
+import meta.InstanceMeta;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import registry.ZkRegistryCenter;
-
-import java.util.List;
+import registry.zk.ZkRegistryCenter;
 
 @Configuration
 public class ConsumerConfig {
@@ -42,13 +40,13 @@ public class ConsumerConfig {
     }
 
     @Bean
-    public LoadBalancer loadBalancer() {
+    public LoadBalancer<InstanceMeta> loadBalancer() {
         //return LoadBalancer.Default;
-        return new RoundRibonLoadBalancer();
+        return new RoundRibonLoadBalancer<>();
     }
 
     @Bean
-    public Router router() {
+    public Router<InstanceMeta> router() {
         return Router.Default;
     }
 

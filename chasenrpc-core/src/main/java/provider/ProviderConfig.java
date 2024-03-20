@@ -6,9 +6,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import registry.ZkRegistryCenter;
-
-import java.util.List;
+import registry.zk.ZkRegistryCenter;
 
 @Configuration
 public class ProviderConfig {

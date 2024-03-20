@@ -58,9 +58,7 @@ public class  ProviderBootstrap implements ApplicationContextAware {
         providers.forEach((String beanName, Object beanObject) -> System.out.println(beanName));
 //        skeleton.putAll(providers);
         rc = applicationContext.getBean(RegistryCenter.class);
-        providers.values().forEach(
-                this::getInterface
-        );
+        providers.values().forEach(this::getInterface);
 
     }
     public void start() {
@@ -77,7 +75,7 @@ public class  ProviderBootstrap implements ApplicationContextAware {
 
     @PreDestroy
     public void stop() {
-        System.out.printf("客户端关闭");
+        System.out.print("客户端关闭");
         skeleton.keySet().forEach(this::unregisterService);
         rc.stop();
     }
@@ -95,25 +93,23 @@ public class  ProviderBootstrap implements ApplicationContextAware {
         rc.unregister(serviceMeta, instance);
     }
 
-    private void getInterface(Object beanObject) {
+    private void getInterface(Object impl) {
         // 拿到接口的全限定的名字和实现类
-        Arrays.stream(beanObject.getClass().getInterfaces()).forEach(anInterface -> {
+        Arrays.stream(impl.getClass().getInterfaces()).forEach(anInterface -> {
             Method[] methods = anInterface.getMethods();
             for (Method method : methods) {
                 if (MethodUtils.checkLocalMethod(method)) {
                     continue;
                 }
-                createProvider(anInterface, beanObject, method);
+                createProvider(anInterface, impl, method);
             }
         });
     }
 
-    private void createProvider(Class<?> anInterface, Object beanObject, Method method) {
-        ProviderMeta meta = new ProviderMeta();
-        meta.setMethodSign(MethodUtils.methodSign(method));
-        meta.setServiceImpl(beanObject);
-        meta.setMethod(method);
-        System.out.print(" create a provider: " + meta);
-        skeleton.add(anInterface.getCanonicalName(), meta);
+    private void createProvider(Class<?> anInterface, Object impl, Method method) {
+        ProviderMeta providerMeta = ProviderMeta.builder().method(method)
+                .serviceImpl(impl).methodSign(MethodUtils.methodSign(method)).build();
+        System.out.print(" create a provider: " + providerMeta);
+        skeleton.add(anInterface.getCanonicalName(), providerMeta);
     }
 }
