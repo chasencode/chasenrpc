@@ -1,37 +1,26 @@
 package consuemer;
 
 import annotation.ChasenConsumer;
-import annotation.ChasenProvider;
-import api.LoadBalancer;
 import api.RegistryCenter;
 import api.Router;
 import api.RpcContext;
 import cluster.RoundRibonLoadBalancer;
-import demo.api.RpcRequest;
-import demo.api.RpcResponse;
-import jakarta.annotation.PostConstruct;
 import lombok.Data;
-import lombok.val;
-import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
-import registry.ChangedListener;
-import registry.Event;
 import util.FiledUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * 消费端动态启动累
+ */
 @Data
 public class ConsumerBootstrap implements ApplicationContextAware {
 
