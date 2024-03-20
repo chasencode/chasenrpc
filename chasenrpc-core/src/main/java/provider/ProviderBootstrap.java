@@ -100,6 +100,7 @@ public class  ProviderBootstrap implements ApplicationContextAware {
         try {
             String ip = InetAddress.getLocalHost().getHostAddress();
             instance = ip + "_" +port;
+            rc.start();
         } catch (UnknownHostException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -111,6 +112,7 @@ public class  ProviderBootstrap implements ApplicationContextAware {
     public void stop() {
         System.out.printf("客户端关闭");
         skeleton.keySet().forEach(this::unregisterService);
+        rc.stop();
     }
 
     private void registerService(String service) {

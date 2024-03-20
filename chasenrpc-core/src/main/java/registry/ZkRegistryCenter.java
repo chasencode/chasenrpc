@@ -61,7 +61,7 @@ public class ZkRegistryCenter implements RegistryCenter {
             }
             // 删除实例的临时节点
             String instancePath = servicePath + "/" + instance;
-            System.out.println(" ===> register to zk: " + instancePath);
+            System.out.println(" ===> unregister to zk: " + instancePath);
             client.delete().quietly().forPath(instancePath);
         } catch (Exception e) {
             e.printStackTrace();
