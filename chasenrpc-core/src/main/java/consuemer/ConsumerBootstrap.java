@@ -46,8 +46,8 @@ public class ConsumerBootstrap implements ApplicationContextAware {
 
     public void start() {
 
-        Router router = applicationContext.getBean(Router.class);
-        RoundRibonLoadBalancer loadBalancer = applicationContext.getBean(RoundRibonLoadBalancer.class);
+        Router<InstanceMeta> router = applicationContext.getBean(Router.class);
+        RoundRibonLoadBalancer<InstanceMeta> loadBalancer = applicationContext.getBean(RoundRibonLoadBalancer.class);
 
         RpcContext context = new RpcContext();
         context.setRouter(router);
@@ -58,8 +58,8 @@ public class ConsumerBootstrap implements ApplicationContextAware {
             Object bean = applicationContext.getBean(beanDefinitionName);
             // 这里获取到了 CGlib 增强提升的子类
             List<Field> fieldList = FiledUtils.findAnnotatedField(bean.getClass(), ChasenConsumer.class);
-            fieldList.stream().forEach(filed -> {
-                System.out.printf("===> " + filed.getName());
+            fieldList.forEach(filed -> {
+                System.out.print("===> " + filed.getName());
                 try {
                     Class<?> service = filed.getType();
                     String serviceName = service.getCanonicalName();

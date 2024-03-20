@@ -9,9 +9,7 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
-import org.jetbrains.annotations.NotNull;
 
-import javax.swing.event.ChangeListener;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +37,7 @@ public class ZkRegistryCenter implements RegistryCenter {
 
     @Override
     public void register(ServiceMeta service, InstanceMeta instance) {
-        String servicePath = "/" + service;
+        String servicePath = "/" + service.toPath();
         try {
             // 创建服务的持久化节点
             if (client.checkExists().forPath(servicePath) == null) {
@@ -57,7 +55,7 @@ public class ZkRegistryCenter implements RegistryCenter {
 
     @Override
     public void unregister(ServiceMeta service, InstanceMeta instance) {
-        String servicePath = "/" + service;
+        String servicePath = "/" + service.toPath();
         try {
             // 创建服务的持久化节点
             if (client.checkExists().forPath(servicePath) == null) {
@@ -96,7 +94,7 @@ public class ZkRegistryCenter implements RegistryCenter {
 
     @Override
     public List<InstanceMeta> fetchAll(ServiceMeta service) {
-        String servicePath = "/" + service;
+        String servicePath = "/" + service.toPath();
         try {
             System.out.println(" ===> fetchAll from zk: " + servicePath);
             final List<String> nodes = client.getChildren().forPath(servicePath);
