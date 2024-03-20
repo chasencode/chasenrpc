@@ -6,6 +6,7 @@ import api.Router;
 import api.RpcContext;
 import cluster.RoundRibonLoadBalancer;
 import lombok.Data;
+import meta.InstanceMeta;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.env.Environment;
@@ -75,20 +76,20 @@ public class ConsumerBootstrap implements ApplicationContextAware {
 
     private Object createFromRegistry(Class<?> service, RpcContext context, RegistryCenter rc) {
         String serviceName = service.getCanonicalName();
-        List<String> providers = mapUrls(rc.fetchAll(serviceName));
+        List<InstanceMeta> providers = rc.fetchAll(serviceName);
         System.out.printf("===》 map to provider");
         providers.forEach(System.out::println);
 
         rc.subscribe(serviceName, event -> {
             providers.clear();
-            providers.addAll(mapUrls(event.getData()));
+            providers.addAll(event.getData());
         });
 
         return createConsumer(service, context, providers);
     }
 
 
-    private Object createConsumer(Class<?> service, RpcContext context, List<String> providers) {
+    private Object createConsumer(Class<?> service, RpcContext context, List<InstanceMeta> providers) {
         return Proxy.newProxyInstance(
                 service.getClassLoader(),
                 new Class[]{service},
@@ -96,10 +97,6 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         );
     }
 
-    private List<String> mapUrls(List<String> nodes) {
-        return nodes.stream()
-                .map(x -> "http://" + x.replace('_', ':')).collect(Collectors.toList());
-    }
 
 
 }

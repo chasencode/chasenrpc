@@ -5,6 +5,7 @@ import consuemer.http.HttpInvoker;
 import consuemer.http.OkHttpInvoker;
 import demo.api.RpcRequest;
 import demo.api.RpcResponse;
+import meta.InstanceMeta;
 import util.MethodUtils;
 import util.TypeUtils;
 
@@ -21,10 +22,10 @@ public class ChasenInvocationHandler implements InvocationHandler {
     private Class<?> service;
 
     private RpcContext context;
-    private List<String> providers;
+    private List<InstanceMeta> providers;
     HttpInvoker httpInvoker = new OkHttpInvoker();
 
-    public ChasenInvocationHandler(Class<?> clazz, RpcContext context, List<String> providers) {
+    public ChasenInvocationHandler(Class<?> clazz, RpcContext context, List<InstanceMeta> providers) {
         this.service = clazz;
         this.context = context;
         this.providers = providers;
@@ -38,8 +39,9 @@ public class ChasenInvocationHandler implements InvocationHandler {
         request.setMethodSign(MethodUtils.methodSign(method));
         request.setArgs(args);
 
-        List<String> urls = context.getRouter().route(providers);
-        String url = (String) context.getLoadBalancer().choose(urls);
+        List<InstanceMeta> instanceMetaList = context.getRouter().route(providers);
+        InstanceMeta InstanceMeta = context.getLoadBalancer().choose(instanceMetaList);
+        String url = InstanceMeta.toString();
         System.out.println("loadBalancer.choose(urls) ==> " + url);
         RpcResponse<?> rpcResponse = httpInvoker.post(request, url);
         if (rpcResponse.isStatus()) {

@@ -1,12 +1,13 @@
 package api;
 
 import lombok.Data;
+import meta.InstanceMeta;
 
 @Data
 public class RpcContext {
 
-    private Router router;
+    private Router<InstanceMeta> router;
 
-    private LoadBalancer loadBalancer;
+    private LoadBalancer<InstanceMeta> loadBalancer;
 
 }

@@ -7,6 +7,7 @@ import demo.api.RpcResponse;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.Data;
+import meta.InstanceMeta;
 import meta.ProviderMeta;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -31,7 +32,7 @@ public class  ProviderBootstrap implements ApplicationContextAware {
 
     private MultiValueMap<String, ProviderMeta> skeleton = new LinkedMultiValueMap<>();
 
-    private String instance;
+    private InstanceMeta instance;
 
     private RegistryCenter rc;
 
@@ -55,7 +56,7 @@ public class  ProviderBootstrap implements ApplicationContextAware {
     public void start() {
         try {
             String ip = InetAddress.getLocalHost().getHostAddress();
-            instance = ip + "_" +port;
+            instance = InstanceMeta.http(ip, Integer.valueOf(port));
             rc.start();
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -72,13 +73,11 @@ public class  ProviderBootstrap implements ApplicationContextAware {
     }
 
     private void registerService(String service) {
-//        final RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
         rc.register(service, instance);
     }
 
 
     private void unregisterService(String service) {
-//        final RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
         rc.unregister(service, instance);
     }
 

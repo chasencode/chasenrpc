@@ -1,6 +1,7 @@
 package cluster;
 
 import api.LoadBalancer;
+import meta.InstanceMeta;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;

@@ -1,5 +1,7 @@
 package api;
 
+import meta.InstanceMeta;
+
 import java.util.List;
 
 /**
