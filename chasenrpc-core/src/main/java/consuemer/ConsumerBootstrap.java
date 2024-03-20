@@ -61,6 +61,7 @@ public class ConsumerBootstrap implements ApplicationContextAware {
                     if (consumer == null) {
 //                        consumer = createConsumer(service, context, List.of(providers));
                         consumer = createFromRegistry(service, context, rc);
+                        stub.put(serviceName, consumer);
                     }
                     filed.setAccessible(true);
                     filed.set(bean, consumer);
