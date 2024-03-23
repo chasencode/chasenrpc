@@ -1,7 +1,7 @@
 package demo.provider;
 
-import demo.api.RpcRequest;
-import demo.api.RpcResponse;
+import api.RpcRequest;
+import api.RpcResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;

@@ -5,6 +5,7 @@ import api.RegistryCenter;
 import api.Router;
 import api.RpcContext;
 import cluster.RoundRibonLoadBalancer;
+import com.sun.net.httpserver.Filter;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import meta.InstanceMeta;
@@ -20,7 +21,6 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 消费端动态启动累
@@ -50,6 +50,7 @@ public class ConsumerBootstrap implements ApplicationContextAware {
 
         Router<InstanceMeta> router = applicationContext.getBean(Router.class);
         RoundRibonLoadBalancer<InstanceMeta> loadBalancer = applicationContext.getBean(RoundRibonLoadBalancer.class);
+        List<Filter> filters = applicationContext.getBeansOfType(Filter.class).values().stream().toList();
 
         RpcContext context = new RpcContext();
         context.setRouter(router);
@@ -100,7 +101,7 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         return Proxy.newProxyInstance(
                 service.getClassLoader(),
                 new Class[]{service},
-                new ChasenInvocationHandler(service, context, providers)
+                new InvocationHandler(service, context, providers)
         );
     }
 

@@ -1,8 +1,8 @@
 package consuemer.http;
 
 import com.alibaba.fastjson.JSON;
-import demo.api.RpcRequest;
-import demo.api.RpcResponse;
+import api.RpcRequest;
+import api.RpcResponse;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 

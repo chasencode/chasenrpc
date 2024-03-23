@@ -1,9 +1,11 @@
 package consuemer;
 
+import api.Filter;
 import api.LoadBalancer;
 import api.RegistryCenter;
 import api.Router;
 import cluster.RoundRibonLoadBalancer;
+import filter.CacheFilter;
 import lombok.extern.slf4j.Slf4j;
 import meta.InstanceMeta;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,5 +57,11 @@ public class ConsumerConfig {
     @Bean(initMethod = "start", destroyMethod = "stop")
     public RegistryCenter consumerRc() {
         return new ZkRegistryCenter();
+    }
+
+
+    @Bean
+    public Filter filter() {
+        return new CacheFilter();
     }
 }

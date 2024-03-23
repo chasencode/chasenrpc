@@ -1,7 +1,7 @@
 package consuemer.http;
 
-import demo.api.RpcRequest;
-import demo.api.RpcResponse;
+import api.RpcRequest;
+import api.RpcResponse;
 
 public interface HttpInvoker {
 
