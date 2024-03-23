@@ -9,12 +9,12 @@
         </plugins>
     </build>
     <parent>
-        <artifactId>chasenrpc</artifactId>
+        <artifactId>demorpc</artifactId>
         <groupId>com.rpc</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 <!--    <groupId>com.rpc</groupId>-->
-    <artifactId>chasenrpc-core</artifactId>
+    <artifactId>rpc-core</artifactId>
 <!--    <version>0.0.1-SNAPSHOT</version>-->
 <!--    <name>chasenrpc-core</name>-->
     <description>Demo project for Spring Boot</description>

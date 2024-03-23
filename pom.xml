@@ -49,10 +49,10 @@
         </plugins>
     </build>
     <modules>
-        <module>chasenrpc-core</module>
-        <module>chasenrpc-demo-api</module>
-        <module>chasenrpc-demo-provider</module>
-        <module>chasen-rpc-demo-consumer</module>
+        <module>rpc-core</module>
+        <module>rpc-demo-api</module>
+        <module>rpc-demo-provider</module>
+        <module>rpc-demo-consumer</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -61,7 +61,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.rpc</groupId>
-    <artifactId>chasenrpc</artifactId>
+    <artifactId>demorpc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>chasenrpc</name>
     <description>Demo project for Spring Boot</description>

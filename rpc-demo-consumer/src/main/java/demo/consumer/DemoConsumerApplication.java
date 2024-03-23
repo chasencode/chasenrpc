@@ -2,7 +2,6 @@ package demo.consumer;
 
 import annotation.ChasenConsumer;
 import consuemer.ConsumerConfig;
-import demo.api.Order;
 import demo.api.OrderService;
 import demo.api.User;
 import demo.api.UserService;
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Import({ConsumerConfig.class})
 @RestController
 @Slf4j
-public class ChasenDemoConsumerApplication {
+public class DemoConsumerApplication {
 
     @ChasenConsumer
     UserService userService;
@@ -37,7 +36,7 @@ public class ChasenDemoConsumerApplication {
     Demo2 demo2;
 
     public static void main(String[] args) {
-        SpringApplication.run(ChasenDemoConsumerApplication.class, args);
+        SpringApplication.run(DemoConsumerApplication.class, args);
     }
 
     @Bean

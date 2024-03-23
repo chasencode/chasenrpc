@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import provider.ProviderBootstrap;
 import provider.ProviderConfig;
 import provider.ProviderInvoker;
 
@@ -20,13 +19,13 @@ import provider.ProviderInvoker;
 @RestController
 @Import({ProviderConfig.class})
 @Slf4j
-public class ChasenDemoProviderApplication {
+public class DemoProviderApplication {
 
     @Autowired
     ProviderInvoker providerInvoker;
 
     public static void main(String[] args) {
-        SpringApplication.run(ChasenDemoProviderApplication.class, args);
+        SpringApplication.run(DemoProviderApplication.class, args);
     }
     // 使用 HTTP + JSON 来时间序列化和通信
 
