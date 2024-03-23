@@ -6,6 +6,7 @@ import api.Router;
 import api.RpcContext;
 import cluster.RoundRibonLoadBalancer;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import meta.InstanceMeta;
 import meta.ServiceMeta;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
  * 消费端动态启动累
  */
 @Data
+@Slf4j
 public class ConsumerBootstrap implements ApplicationContextAware {
 
     ApplicationContext applicationContext;
@@ -59,7 +61,7 @@ public class ConsumerBootstrap implements ApplicationContextAware {
             // 这里获取到了 CGlib 增强提升的子类
             List<Field> fieldList = FiledUtils.findAnnotatedField(bean.getClass(), ChasenConsumer.class);
             fieldList.forEach(filed -> {
-                System.out.print("===> " + filed.getName());
+                log.info("===> " + filed.getName());
                 try {
                     Class<?> service = filed.getType();
                     String serviceName = service.getCanonicalName();
@@ -83,8 +85,7 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         ServiceMeta serviceMeta = ServiceMeta.builder()
                 .app(app).namespace(namespace).env(env).name(service.getCanonicalName()).build();
         List<InstanceMeta> providers = rc.fetchAll(serviceMeta);
-        System.out.printf("===》 map to provider");
-        providers.forEach(System.out::println);
+        log.info("===》 map to provider");
 
         rc.subscribe(serviceMeta, event -> {
             providers.clear();

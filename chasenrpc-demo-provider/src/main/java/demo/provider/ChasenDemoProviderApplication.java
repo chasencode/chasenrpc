@@ -2,6 +2,7 @@ package demo.provider;
 
 import demo.api.RpcRequest;
 import demo.api.RpcResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -18,6 +19,7 @@ import provider.ProviderInvoker;
 @SpringBootApplication
 @RestController
 @Import({ProviderConfig.class})
+@Slf4j
 public class ChasenDemoProviderApplication {
 
     @Autowired
@@ -42,14 +44,14 @@ public class ChasenDemoProviderApplication {
             request.setMethodSign("findById@1_int");
             request.setArgs(new Object[]{100});
             RpcResponse<Object> rpcResponse = providerInvoker.invoke(request);
-            System.out.println("return:" + rpcResponse.getData());
+            log.info("return:" + rpcResponse.getData());
 
             RpcRequest request2 = new RpcRequest();
             request2.setService("demo.api.UserService");
             request2.setMethodSign("findById@2_int_java.long.long.String");
             request2.setArgs(new Object[]{101, "Chasen"});
             RpcResponse<Object> rpcResponse2 = providerInvoker.invoke(request);
-            System.out.println("return2:" + rpcResponse2.getData());
+            log.info("return2:" + rpcResponse2.getData());
         };
     }
 }

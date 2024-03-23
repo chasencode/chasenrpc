@@ -3,11 +3,12 @@ package consuemer.http;
 import com.alibaba.fastjson.JSON;
 import demo.api.RpcRequest;
 import demo.api.RpcResponse;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-
+@Slf4j
 public class OkHttpInvoker implements HttpInvoker {
     final static MediaType JSONTYPE = MediaType.get("application/json; charset=utf-8");
 
@@ -27,13 +28,13 @@ public class OkHttpInvoker implements HttpInvoker {
     public RpcResponse<?> post(RpcRequest rpcRequest, String url) {
         try {
             String requestJson = JSON.toJSONString(rpcRequest);
-            System.out.println(" ===> reqJson = " + requestJson);
+            log.debug(" ===> reqJson = " + requestJson);
             Request request = new Request.Builder()
                     .url(url)
                     .post(RequestBody.create(requestJson, JSONTYPE))
                     .build();
             String respJson = client.newCall(request).execute().body().string();
-            System.out.println(" ===> respJson = " + respJson);
+            log.debug(" ===> respJson = " + respJson);
             return JSON.parseObject(respJson, RpcResponse.class);
         } catch (IOException e) {
             e.printStackTrace();

@@ -7,6 +7,7 @@ import demo.api.RpcResponse;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import meta.InstanceMeta;
 import meta.ProviderMeta;
 import meta.ServiceMeta;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
+@Slf4j
 public class  ProviderBootstrap implements ApplicationContextAware {
 
     ApplicationContext applicationContext;
@@ -55,7 +57,7 @@ public class  ProviderBootstrap implements ApplicationContextAware {
     public void init() {
         // 获取所有使用这个注解的bean
         Map<String, Object> providers = applicationContext.getBeansWithAnnotation(ChasenProvider.class);
-        providers.forEach((String beanName, Object beanObject) -> System.out.println(beanName));
+//        providers.forEach((String beanName, Object beanObject) -> log.infoln(beanName));
 //        skeleton.putAll(providers);
         rc = applicationContext.getBean(RegistryCenter.class);
         providers.values().forEach(this::getInterface);
@@ -75,7 +77,7 @@ public class  ProviderBootstrap implements ApplicationContextAware {
 
     @PreDestroy
     public void stop() {
-        System.out.print("客户端关闭");
+        log.info("客户端关闭");
         skeleton.keySet().forEach(this::unregisterService);
         rc.stop();
     }
@@ -109,7 +111,7 @@ public class  ProviderBootstrap implements ApplicationContextAware {
     private void createProvider(Class<?> anInterface, Object impl, Method method) {
         ProviderMeta providerMeta = ProviderMeta.builder().method(method)
                 .serviceImpl(impl).methodSign(MethodUtils.methodSign(method)).build();
-        System.out.print(" create a provider: " + providerMeta);
+        log.info(" create a provider: " + providerMeta);
         skeleton.add(anInterface.getCanonicalName(), providerMeta);
     }
 }

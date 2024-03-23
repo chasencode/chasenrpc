@@ -4,6 +4,7 @@ import api.LoadBalancer;
 import api.RegistryCenter;
 import api.Router;
 import cluster.RoundRibonLoadBalancer;
+import lombok.extern.slf4j.Slf4j;
 import meta.InstanceMeta;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import org.springframework.core.annotation.Order;
 import registry.zk.ZkRegistryCenter;
 
 @Configuration
+@Slf4j
 public class ConsumerConfig {
 
     @Value("${chasenrpc.providers}")
@@ -33,9 +35,9 @@ public class ConsumerConfig {
     @Order(Integer.MIN_VALUE)
     public ApplicationRunner consumerBootstrapRunner(@Autowired ConsumerBootstrap consumerBootstrap) {
         return x-> {
-            System.out.println("consumerBootstrap starting ...");
+           log.info("consumerBootstrap starting ...");
             consumerBootstrap.start();
-            System.out.println("consumerBootstrap started ...");
+           log.info("consumerBootstrap started ...");
         };
     }
 

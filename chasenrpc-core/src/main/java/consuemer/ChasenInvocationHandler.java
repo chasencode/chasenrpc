@@ -5,6 +5,7 @@ import consuemer.http.HttpInvoker;
 import consuemer.http.OkHttpInvoker;
 import demo.api.RpcRequest;
 import demo.api.RpcResponse;
+import lombok.extern.slf4j.Slf4j;
 import meta.InstanceMeta;
 import util.MethodUtils;
 import util.TypeUtils;
@@ -16,6 +17,7 @@ import java.util.List;
 /**
  * 消费端动态代理了
  */
+@Slf4j
 public class ChasenInvocationHandler implements InvocationHandler {
 
 
@@ -42,7 +44,7 @@ public class ChasenInvocationHandler implements InvocationHandler {
         List<InstanceMeta> instanceMetaList = context.getRouter().route(providers);
         InstanceMeta InstanceMeta = context.getLoadBalancer().choose(instanceMetaList);
         String url = InstanceMeta.toUrl();
-        System.out.println("loadBalancer.choose(urls) ==> " + url);
+        log.debug("loadBalancer.choose(urls) ==> " + url);
         RpcResponse<?> rpcResponse = httpInvoker.post(request, url);
         if (rpcResponse.isStatus()) {
             Object data = rpcResponse.getData();
