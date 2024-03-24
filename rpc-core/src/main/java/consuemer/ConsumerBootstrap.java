@@ -1,11 +1,11 @@
 package consuemer;
 
 import annotation.ChasenConsumer;
+import api.Filter;
 import api.RegistryCenter;
 import api.Router;
 import api.RpcContext;
 import cluster.RoundRibonLoadBalancer;
-import com.sun.net.httpserver.Filter;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import meta.InstanceMeta;
@@ -51,10 +51,10 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         Router<InstanceMeta> router = applicationContext.getBean(Router.class);
         RoundRibonLoadBalancer<InstanceMeta> loadBalancer = applicationContext.getBean(RoundRibonLoadBalancer.class);
         List<Filter> filters = applicationContext.getBeansOfType(Filter.class).values().stream().toList();
-
         RpcContext context = new RpcContext();
         context.setRouter(router);
         context.setLoadBalancer(loadBalancer);
+        context.setFilters(filters);
         RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
         String[] beanDefinitionNames = applicationContext.getBeanDefinitionNames();
         for (String beanDefinitionName : beanDefinitionNames) {
