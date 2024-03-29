@@ -28,6 +28,7 @@
         <okhttp.version>4.9.1</okhttp.version>
         <curator-client.version>5.1.0</curator-client.version>
         <curator-recipes.version>5.1.0</curator-recipes.version>
+        <curator-test.version>5.1.0</curator-test.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -51,6 +52,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
                 <scope>test</scope>
+                <version>${spring.boot.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.alibaba</groupId>
@@ -71,6 +73,11 @@
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-recipes</artifactId>
                 <version>${curator-recipes.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-test</artifactId>
+                <version>${curator-test.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

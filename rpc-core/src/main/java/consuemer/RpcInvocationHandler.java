@@ -11,6 +11,7 @@ import meta.InstanceMeta;
 import util.MethodUtils;
 import util.TypeUtils;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
  * 消费端动态代理了
  */
 @Slf4j
-public class InvocationHandler implements java.lang.reflect.InvocationHandler {
+public class RpcInvocationHandler implements InvocationHandler {
 
 
     private Class<?> service;
@@ -27,7 +28,7 @@ public class InvocationHandler implements java.lang.reflect.InvocationHandler {
     private List<InstanceMeta> providers;
     HttpInvoker httpInvoker = new OkHttpInvoker();
 
-    public InvocationHandler(Class<?> clazz, RpcContext context, List<InstanceMeta> providers) {
+    public RpcInvocationHandler(Class<?> clazz, RpcContext context, List<InstanceMeta> providers) {
         this.service = clazz;
         this.context = context;
         this.providers = providers;

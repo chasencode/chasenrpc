@@ -101,7 +101,7 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         return Proxy.newProxyInstance(
                 service.getClassLoader(),
                 new Class[]{service},
-                new InvocationHandler(service, context, providers)
+                new RpcInvocationHandler(service, context, providers)
         );
     }
 

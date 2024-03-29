@@ -1,22 +1,44 @@
 package demo.api;
 
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Description for this class.
+ *
+ * @Author : Chasen
+ * @create 2024/3/6 20:36
+ */
 public interface UserService {
 
     User findById(int id);
 
-    User findById(Integer id, String name);
+    User findById(int id, String name);
 
-    User findUserOrder(Integer id);
+    long getId(long id);
 
-    Long findLong(Long id);
+    long getId(User user);
 
-    Long findLong(User user);
+    long getId(float id);
 
-    long getFloatId(float id);
+    String getName();
 
-    int[] getIntIds();
+    String getName(int id);
 
+    int[] getIds();
     long[] getLongIds();
-
     int[] getIds(int[] ids);
+
+    User[] findUsers(User[] users);
+
+    List<User> getList(List<User> userList);
+
+    Map<String, User> getMap(Map<String, User> userMap);
+
+    Boolean getFlag(boolean flag);
+
+    User findById(long id);
+
+    User ex(boolean flag);
+
 }

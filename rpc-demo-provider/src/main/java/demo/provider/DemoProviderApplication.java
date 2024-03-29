@@ -34,23 +34,23 @@ public class DemoProviderApplication {
     public RpcResponse<Object> invoke(@RequestBody RpcRequest request) {
         return  providerInvoker.invoke(request);
     }
-
-    @Bean
-    ApplicationRunner providerRun() {
-        return x -> {
-            RpcRequest request = new RpcRequest();
-            request.setService("demo.api.UserService");
-            request.setMethodSign("findById@1_int");
-            request.setArgs(new Object[]{100});
-            RpcResponse<Object> rpcResponse = providerInvoker.invoke(request);
-            log.info("return:" + rpcResponse.getData());
-
-            RpcRequest request2 = new RpcRequest();
-            request2.setService("demo.api.UserService");
-            request2.setMethodSign("findById@2_int_java.long.long.String");
-            request2.setArgs(new Object[]{101, "Chasen"});
-            RpcResponse<Object> rpcResponse2 = providerInvoker.invoke(request);
-            log.info("return2:" + rpcResponse2.getData());
-        };
-    }
+//
+//    @Bean
+//    ApplicationRunner providerRun() {
+//        return x -> {
+//            RpcRequest request = new RpcRequest();
+//            request.setService("demo.api.UserService");
+//            request.setMethodSign("findById@1_int");
+//            request.setArgs(new Object[]{100});
+//            RpcResponse<Object> rpcResponse = providerInvoker.invoke(request);
+//            log.info("return:" + rpcResponse.getData());
+//
+//            RpcRequest request2 = new RpcRequest();
+//            request2.setService("demo.api.UserService");
+//            request2.setMethodSign("findById@2_int_java.long.long.String");
+//            request2.setArgs(new Object[]{101, "Chasen"});
+//            RpcResponse<Object> rpcResponse2 = providerInvoker.invoke(request);
+//            log.info("return2:" + rpcResponse2.getData());
+//        };
+//    }
 }
