@@ -6,7 +6,7 @@ chasenrpc:
 
 
 rpc:
-  zkServer: localhost:2181
+  zkServer: 127.0.0.1:2181
   zkRoot: rpc
 
 app:

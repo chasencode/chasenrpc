@@ -1,4 +1,4 @@
-package demo.provider;
+package cn.chasen.rpc.provider;
 
 import cn.chasen.rpc.core.annotation.ChasenProvider;
 import cn.chasen.rpc.demo.api.User;

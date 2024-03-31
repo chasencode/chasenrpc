@@ -1,15 +1,19 @@
 server:
-  port: 8088
+  port: 8089
 
 chasenrpc:
-  providers: http://127.0.0.1:8081,http://127.0.0.1:8082
+  providers: http://127.0.0.1:8081,http://127.0.0.1:8083
 
 
 rpc:
-  zkServer: localhost:2181
-  zkRoot: rpc
+  zkServer: 127.0.0.1:2182
+  zkRoot: rpctest
 
 app:
-  id: app1
+  id: apptest
   namespace: public
   env: dev
+logging:
+  level:
+    root: info
+    cn.chasen.rpc: debug
