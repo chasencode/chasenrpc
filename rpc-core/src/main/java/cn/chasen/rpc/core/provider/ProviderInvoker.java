@@ -2,6 +2,7 @@ package cn.chasen.rpc.core.provider;
 
 import cn.chasen.rpc.core.api.RpcRequest;
 import cn.chasen.rpc.core.api.RpcResponse;
+import cn.chasen.rpc.core.exception.RpcException;
 import cn.chasen.rpc.core.meta.ProviderMeta;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.MultiValueMap;
@@ -37,13 +38,9 @@ public class ProviderInvoker {
             rpcResponse.setStatus(true);
             rpcResponse.setData(result);
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            // 不想给客户端暴露服务端的堆栈信息，所以只需要返回 execption msg 就可以了
-            // 反射目标一场 需要拿到目标信息的一场
-            rpcResponse.setEx(new RuntimeException(e.getTargetException().getMessage()));
-
+            rpcResponse.setEx(new RpcException(e.getTargetException().getMessage()));
         } catch (IllegalAccessException e) {
-            rpcResponse.setEx(new RuntimeException(e.getMessage()));
+            rpcResponse.setEx(new RpcException(e.getMessage()));
         }
         return rpcResponse;
     }

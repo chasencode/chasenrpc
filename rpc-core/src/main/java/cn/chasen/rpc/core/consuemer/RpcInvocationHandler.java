@@ -4,6 +4,7 @@ import cn.chasen.rpc.core.api.Filter;
 import cn.chasen.rpc.core.api.RpcContext;
 import cn.chasen.rpc.core.api.RpcRequest;
 import cn.chasen.rpc.core.api.RpcResponse;
+import cn.chasen.rpc.core.exception.RpcException;
 import cn.chasen.rpc.core.meta.InstanceMeta;
 import cn.chasen.rpc.core.util.SlidingTimeWindow;
 import cn.chasen.rpc.core.consuemer.http.HttpInvoker;
@@ -106,11 +107,11 @@ public class RpcInvocationHandler implements InvocationHandler {
                 if (!providers.contains(instanceMeta)) {
                     isolatedProviders.remove(instanceMeta);
                     providers.add(instanceMeta);
-                    log.debug("instance {} is recovered, isolatedProviders={}, providers={}", isolatedProviders, providers);
+                    log.debug("instance {} is recovered, isolatedProviders={}, providers={}",instanceMeta, isolatedProviders, providers);
                 }
             }
 
-            return null;
+            throw e;
         }
 
 
@@ -130,8 +131,13 @@ public class RpcInvocationHandler implements InvocationHandler {
             Object data = rpcResponse.getData();
             return TypeUtils.castMethodResult(method, data);
         } else {
-            Exception ex = rpcResponse.getEx();
-            throw new RuntimeException(ex);
+            final Exception ex = rpcResponse.getEx();
+            if (ex instanceof RpcException rpcException) {
+                throw rpcException;
+            } else {
+                throw new RpcException(rpcResponse.getEx(), RpcException.UnknownEx);
+            }
+
         }
     }
 }

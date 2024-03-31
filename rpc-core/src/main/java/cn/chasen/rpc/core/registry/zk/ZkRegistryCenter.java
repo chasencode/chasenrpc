@@ -1,6 +1,7 @@
 package cn.chasen.rpc.core.registry.zk;
 
 import cn.chasen.rpc.core.api.RegistryCenter;
+import cn.chasen.rpc.core.exception.RpcException;
 import cn.chasen.rpc.core.registry.ChangedListener;
 import lombok.extern.slf4j.Slf4j;
 import cn.chasen.rpc.core.meta.InstanceMeta;
@@ -62,7 +63,7 @@ public class ZkRegistryCenter implements RegistryCenter {
             client.create().withMode(CreateMode.EPHEMERAL).forPath(instancePath, "provider".getBytes());
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new RpcException(e);
         }
     }
 
@@ -80,7 +81,7 @@ public class ZkRegistryCenter implements RegistryCenter {
             client.delete().quietly().forPath(instancePath);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new RpcException(e);
         }
     }
 
@@ -100,8 +101,7 @@ public class ZkRegistryCenter implements RegistryCenter {
             );
             cache.start();
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new RpcException(e);
         }
     }
 
@@ -117,7 +117,7 @@ public class ZkRegistryCenter implements RegistryCenter {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("进入这里错误了");
-            throw new RuntimeException(e);
+            throw new RpcException(e);
         }
     }
 
