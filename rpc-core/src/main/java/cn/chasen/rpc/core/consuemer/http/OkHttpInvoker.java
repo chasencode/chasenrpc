@@ -36,8 +36,7 @@ public class OkHttpInvoker implements HttpInvoker {
             String respJson = client.newCall(request).execute().body().string();
             log.debug(" ===> respJson = " + respJson);
             return JSON.parseObject(respJson, RpcResponse.class);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

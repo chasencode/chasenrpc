@@ -15,6 +15,8 @@ import cn.chasen.rpc.core.util.TypeUtils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,55 +67,70 @@ public class RpcInvocationHandler implements InvocationHandler {
         request.setMethodSign(MethodUtils.methodSign(method));
         request.setArgs(args);
 
-        for (Filter filter : this.context.getFilters()) {
-            Object preResult = filter.prefilter(request);
-            if (preResult != null) {
-                log.debug(filter.getClass().getName() + " ==> prefilter: " + preResult);
-                return preResult;
-            }
-        }
-        InstanceMeta instanceMeta;
-        synchronized (halfOpenProviders) {
-            if (halfOpenProviders.isEmpty()) {
-                List<InstanceMeta> instanceMetaList = context.getRouter().route(providers);
-                instanceMeta = context.getLoadBalancer().choose(instanceMetaList);
-                log.debug("loadBalancer.choose(urls) ==> {}", instanceMeta);
-            } else {
-                instanceMeta = halfOpenProviders.remove(0);
-                log.debug("check alive instance ===> {}", instanceMeta);
-            }
-        }
+        int retries = Integer.parseInt(context.getParameters().getOrDefault("app.retries", "1"));
 
-        String url = instanceMeta.toUrl();
+        while (retries --> 0) {
+            try {
+                log.info(" ===> reties: " + retries);
+        //        for (Filter filter : this.context.getFilters()) {
+        //            Object preResult = filter.prefilter(request);
+        //            if (preResult != null) {
+        //                log.debug(filter.getClass().getName() + " ==> prefilter: " + preResult);
+        //                return preResult;
+        //            }
+        //        }
+                InstanceMeta instanceMeta;
+                synchronized (halfOpenProviders) {
+                    if (halfOpenProviders.isEmpty()) {
+                        List<InstanceMeta> instanceMetaList = context.getRouter().route(providers);
+                        instanceMeta = context.getLoadBalancer().choose(instanceMetaList);
+                        log.debug("loadBalancer.choose(urls) ==> {}", instanceMeta);
+                    } else {
+                        instanceMeta = halfOpenProviders.remove(0);
+                        log.debug("check alive instance ===> {}", instanceMeta);
+                    }
+                }
 
-        try {
-            RpcResponse<?> rpcResponse = httpInvoker.post(request, url);
-            Object result = castReturnResult(method, rpcResponse);
+                String url = instanceMeta.toUrl();
+
+                try {
+                    RpcResponse<?> rpcResponse = httpInvoker.post(request, url);
+                    Object result = castReturnResult(method, rpcResponse);
 //            for (Filter filter : this.context.getFilters()) {
 //                Object filterResult = filter.postfilter(request, rpcResponse, result);
 //                if(filterResult != null) {
 //                    return filterResult;
 //                }
 //            }
-            return result;
-        } catch (Exception e) {
-            SlidingTimeWindow window = windows.computeIfAbsent(url, k -> new SlidingTimeWindow());
-            window.record(System.currentTimeMillis());
-            if (window.getSum() >= 10) {
-                isolate(instanceMeta);
-            }
+                    return result;
+                } catch (Exception e) {
+                    SlidingTimeWindow window = windows.computeIfAbsent(url, k -> new SlidingTimeWindow());
+                    window.record(System.currentTimeMillis());
+                    if (window.getSum() >= 10) {
+                        isolate(instanceMeta);
+                    }
 
-            synchronized ((providers)) {
-                if (!providers.contains(instanceMeta)) {
-                    isolatedProviders.remove(instanceMeta);
-                    providers.add(instanceMeta);
-                    log.debug("instance {} is recovered, isolatedProviders={}, providers={}",instanceMeta, isolatedProviders, providers);
+                    synchronized ((providers)) {
+                        if (!providers.contains(instanceMeta)) {
+                            isolatedProviders.remove(instanceMeta);
+                            providers.add(instanceMeta);
+                            log.debug("instance {} is recovered, isolatedProviders={}, providers={}",instanceMeta, isolatedProviders, providers);
+                        }
+                    }
+
+                    throw e;
+                }
+
+            } catch (RuntimeException ex) {
+                if (!(ex.getCause() instanceof SocketTimeoutException)) {
+                    throw ex;
                 }
             }
-
-            throw e;
         }
 
+
+
+        return null;
 
     }
 

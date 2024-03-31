@@ -9,3 +9,6 @@ Content-Type: application/json
 
 ### 获取8088用户信息
 GET http://127.0.0.1:8088/?id=101
+
+### 通过8088调用超时接口
+GET http://127.0.0.1:8088/find/?timeout=1100

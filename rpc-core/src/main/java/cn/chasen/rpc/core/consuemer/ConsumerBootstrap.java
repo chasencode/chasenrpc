@@ -45,6 +45,10 @@ public class ConsumerBootstrap implements ApplicationContextAware {
     @Value("${app.env}")
     private String env;
 
+    @Value("${app.retries}")
+    private String retries;
+
+
 
     public void start() {
 
@@ -55,6 +59,7 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         context.setRouter(router);
         context.setLoadBalancer(loadBalancer);
         context.setFilters(filters);
+        context.getParameters().put("app.retries", String.valueOf(retries));
         RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
         String[] beanDefinitionNames = applicationContext.getBeanDefinitionNames();
         for (String beanDefinitionName : beanDefinitionNames) {

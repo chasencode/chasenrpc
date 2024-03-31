@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
@@ -31,6 +32,12 @@ public class DemoConsumerApplication {
     @RequestMapping("/findById")
     public User findBy(int id) {
         return userService.findById(id);
+    }
+
+
+    @RequestMapping("/find/")
+    public User find(@RequestParam("timeout") int timeout) {
+        return userService.find(timeout);
     }
 
     @Autowired
