@@ -8,7 +8,7 @@ app:
   id: app1
   namespace: public
   env: dev
-  retries: 2
+  metas: "{'gray': 'false', 'dc':'bj', 'unit':'B001'}"
 logging:
   level:
     root: error

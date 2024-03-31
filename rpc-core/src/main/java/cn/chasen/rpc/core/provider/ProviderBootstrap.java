@@ -47,13 +47,13 @@ public class  ProviderBootstrap implements ApplicationContextAware {
     private String env;
 
 
+    @Value("#{${app.metas}}")
+    private Map<String, String> metas;
 
     @PostConstruct
     public void init() {
         // 获取所有使用这个注解的bean
         Map<String, Object> providers = applicationContext.getBeansWithAnnotation(ChasenProvider.class);
-//        providers.forEach((String beanName, Object beanObject) -> log.infoln(beanName));
-//        skeleton.putAll(providers);
         rc = applicationContext.getBean(RegistryCenter.class);
         providers.values().forEach(this::getInterface);
 
@@ -62,6 +62,7 @@ public class  ProviderBootstrap implements ApplicationContextAware {
         try {
             String ip = InetAddress.getLocalHost().getHostAddress();
             instance = InstanceMeta.http(ip, Integer.valueOf(port));
+            instance.getParameters().putAll(this.metas);
             log.info("provider start instance ={}", instance);
             rc.start();
         } catch (UnknownHostException e) {
