@@ -1,6 +1,7 @@
 package cn.chasen.rpc.consumer;
 
 import cn.chasen.rpc.core.annotation.ChasenConsumer;
+import cn.chasen.rpc.core.cluster.GrayRouter;
 import cn.chasen.rpc.core.consuemer.ConsumerConfig;
 import cn.chasen.rpc.demo.api.User;
 import cn.chasen.rpc.demo.api.UserService;
@@ -38,6 +39,11 @@ public class DemoConsumerApplication {
     @RequestMapping("/find/")
     public User find(@RequestParam("timeout") int timeout) {
         return userService.find(timeout);
+    }
+
+
+    @RequestMapping("/gray/")
+    public void gray(@RequestParam("ratio") int ratio) {
     }
 
     @Autowired

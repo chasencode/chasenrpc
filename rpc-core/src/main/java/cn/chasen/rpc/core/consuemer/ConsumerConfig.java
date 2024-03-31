@@ -4,6 +4,7 @@ import cn.chasen.rpc.core.api.Filter;
 import cn.chasen.rpc.core.api.LoadBalancer;
 import cn.chasen.rpc.core.api.RegistryCenter;
 import cn.chasen.rpc.core.api.Router;
+import cn.chasen.rpc.core.cluster.GrayRouter;
 import cn.chasen.rpc.core.cluster.RoundRibonLoadBalancer;
 import cn.chasen.rpc.core.filter.CacheFilter;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,9 @@ public class ConsumerConfig {
 
     @Value("${chasenrpc.providers}")
     String servers;
+
+    @Value("${app.grayRatio}")
+    private int grayRatio;
 
     @Bean
     ConsumerBootstrap createConsumerBootstrap() {
@@ -51,7 +55,7 @@ public class ConsumerConfig {
 
     @Bean
     public Router<InstanceMeta> router() {
-        return Router.Default;
+        return new GrayRouter(grayRatio);
     }
 
     @Bean(initMethod = "start", destroyMethod = "stop")

@@ -14,3 +14,5 @@ app:
   namespace: public
   env: dev
   retries: 2
+  timeout: 1000
+  grayRatio: 10  #0-100
