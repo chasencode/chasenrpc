@@ -29,8 +29,8 @@ public class DemoConsumerApplication {
     @ChasenConsumer
     UserService userService;
 
-    @RequestMapping("/findById")
-    public User findBy(int id) {
+    @RequestMapping("/findById/")
+    public User findBy(@RequestParam("id") int id) {
         return userService.findById(id);
     }
 
