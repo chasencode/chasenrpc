@@ -41,6 +41,13 @@
             <artifactId>rpc-demo-api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        <!--打包时不带，跑单元测试时带-->
+        <dependency>
+            <groupId>com.rpc</groupId>
+            <artifactId>rpc-demo-provider</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

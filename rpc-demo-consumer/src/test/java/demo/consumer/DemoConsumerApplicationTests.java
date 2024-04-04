@@ -1,7 +1,7 @@
 package demo.consumer;
 
 import cn.chasen.rpc.consumer.DemoConsumerApplication;
-import demo.provider.DemoProviderApplicationTests;
+import cn.chasen.rpc.provider.DemoProviderApplication;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ class DemoConsumerApplicationTests {
         System.out.println(" =============      P8094    ========== ");
         System.out.println(" ====================================== ");
         System.out.println(" ====================================== ");
-        context1 = SpringApplication.run(DemoProviderApplicationTests.class,
+        context1 = SpringApplication.run(DemoProviderApplication.class,
                 "--server.port=8094", "--rpc.zkServer=127.0.0.1:2182", "--rpc.zkRoot=rpctest",
                 "--logging.level.cn.chasen.rpc=info");
 //        System.out.println(" ====================================== ");
