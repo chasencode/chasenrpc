@@ -72,13 +72,13 @@ public class RpcInvocationHandler implements InvocationHandler {
         while (retries --> 0) {
             try {
                 log.info(" ===> reties: " + retries);
-        //        for (Filter filter : this.context.getFilters()) {
-        //            Object preResult = filter.prefilter(request);
-        //            if (preResult != null) {
-        //                log.debug(filter.getClass().getName() + " ==> prefilter: " + preResult);
-        //                return preResult;
-        //            }
-        //        }
+                for (Filter filter : this.context.getFilters()) {
+                    Object preResult = filter.prefilter(request);
+                    if (preResult != null) {
+                        log.debug(filter.getClass().getName() + " ==> prefilter: " + preResult);
+                        return preResult;
+                    }
+                }
                 InstanceMeta instanceMeta;
                 synchronized (halfOpenProviders) {
                     if (halfOpenProviders.isEmpty()) {
@@ -96,12 +96,12 @@ public class RpcInvocationHandler implements InvocationHandler {
                 try {
                     RpcResponse<?> rpcResponse = httpInvoker.post(request, url);
                     Object result = castReturnResult(method, rpcResponse);
-//            for (Filter filter : this.context.getFilters()) {
-//                Object filterResult = filter.postfilter(request, rpcResponse, result);
-//                if(filterResult != null) {
-//                    return filterResult;
-//                }
-//            }
+                for (Filter filter : this.context.getFilters()) {
+                    Object filterResult = filter.postfilter(request, rpcResponse, result);
+                    if(filterResult != null) {
+                        return filterResult;
+                    }
+                }
                     return result;
                 } catch (Exception e) {
                     SlidingTimeWindow window = windows.computeIfAbsent(url, k -> new SlidingTimeWindow());

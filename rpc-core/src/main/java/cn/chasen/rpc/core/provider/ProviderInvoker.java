@@ -1,5 +1,6 @@
 package cn.chasen.rpc.core.provider;
 
+import cn.chasen.rpc.core.api.RpcContext;
 import cn.chasen.rpc.core.api.RpcRequest;
 import cn.chasen.rpc.core.api.RpcResponse;
 import cn.chasen.rpc.core.exception.RpcException;
@@ -22,12 +23,15 @@ public class ProviderInvoker {
 
     public RpcResponse<Object> invoke(RpcRequest request) {
         String methodSign = request.getMethodSign();
-        log.debug("provider invoke request = {}", request);
+        log.debug(" ===> ProviderInvoker.invoke(request:{})", request);
+        // 将consumer 端传递过来的额外信息，写入到RPC 山下文中
+        if(!request.getParams().isEmpty()) {
+            request.getParams().forEach(RpcContext::setContextParameter);
+        }
         List<ProviderMeta> providerMetaList = skeleton.get(request.getService());
 
         RpcResponse<Object> rpcResponse = new RpcResponse<Object>();
         try {
-
             ProviderMeta meta = findProviderMeta(providerMetaList, methodSign);
             if (meta == null) {
                 throw new RuntimeException(request.getService() + " not find");
@@ -41,6 +45,9 @@ public class ProviderInvoker {
             rpcResponse.setEx(new RpcException(e.getTargetException().getMessage()));
         } catch (IllegalAccessException e) {
             rpcResponse.setEx(new RpcException(   e.getMessage()));
+        } finally {
+            // 去除上下文中 要传递的参数
+            RpcContext.ContextParameters.get().clear();
         }
         return rpcResponse;
     }

@@ -7,6 +7,7 @@ import cn.chasen.rpc.core.api.Router;
 import cn.chasen.rpc.core.cluster.GrayRouter;
 import cn.chasen.rpc.core.cluster.RoundRibonLoadBalancer;
 import cn.chasen.rpc.core.filter.CacheFilter;
+import cn.chasen.rpc.core.filter.ParameterFilter;
 import lombok.extern.slf4j.Slf4j;
 import cn.chasen.rpc.core.meta.InstanceMeta;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,9 +64,12 @@ public class ConsumerConfig {
         return new ZkRegistryCenter();
     }
 
-
+    /**
+     * @todo 改为配置 filetr
+     * @return filter
+     */
     @Bean
     public Filter filter() {
-        return new CacheFilter();
+        return new ParameterFilter();
     }
 }

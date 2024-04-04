@@ -1,6 +1,7 @@
 package cn.chasen.rpc.provider;
 
 import cn.chasen.rpc.core.annotation.ChasenProvider;
+import cn.chasen.rpc.core.api.RpcContext;
 import cn.chasen.rpc.demo.api.User;
 import cn.chasen.rpc.demo.api.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,5 +127,12 @@ public class UserServiceImpl implements UserService {
 
     public void setTimeoutPorts(String timeoutPorts) {
         this.timeoutPorts = timeoutPorts;
+    }
+
+    @Override
+    public String echoParameter(String key) {
+        System.out.println(" ====>> RpcContext.ContextParameters: ");
+        RpcContext.ContextParameters.get().forEach((k, v)-> System.out.println(k+" -> " +v));
+        return RpcContext.getContextParameter(key);
     }
 }
