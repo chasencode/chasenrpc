@@ -1,5 +1,6 @@
 package cn.chasen.rpc.core.api;
 
+import cn.chasen.rpc.core.exception.RpcException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ public class RpcResponse<T> {
 
     private T data;
 
-    private Exception ex;
+    private RpcException ex;
 
 
 }

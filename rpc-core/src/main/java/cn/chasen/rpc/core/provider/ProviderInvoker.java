@@ -40,7 +40,7 @@ public class ProviderInvoker {
         } catch (InvocationTargetException e) {
             rpcResponse.setEx(new RpcException(e.getTargetException().getMessage()));
         } catch (IllegalAccessException e) {
-            rpcResponse.setEx(new RpcException(e.getMessage()));
+            rpcResponse.setEx(new RpcException(   e.getMessage()));
         }
         return rpcResponse;
     }

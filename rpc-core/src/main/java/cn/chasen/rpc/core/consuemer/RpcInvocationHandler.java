@@ -148,13 +148,11 @@ public class RpcInvocationHandler implements InvocationHandler {
             Object data = rpcResponse.getData();
             return TypeUtils.castMethodResult(method, data);
         } else {
-            final Exception ex = rpcResponse.getEx();
-            if (ex instanceof RpcException rpcException) {
-                throw rpcException;
-            } else {
-                throw new RpcException(rpcResponse.getEx(), RpcException.UnknownEx);
+            RpcException ex = rpcResponse.getEx();
+            if (ex != null) {
+                throw ex;
             }
-
+            return null;
         }
     }
 }
