@@ -3,9 +3,9 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>demorpc</artifactId>
-        <groupId>com.rpc</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <artifactId>chasenrpc</artifactId>
+        <groupId>io.github.chasencode</groupId>
+        <version>${rpc.version}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -32,20 +32,20 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.rpc</groupId>
+            <groupId>io.github.chasencode</groupId>
             <artifactId>rpc-core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${rpc.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.rpc</groupId>
+            <groupId>io.github.chasencode</groupId>
             <artifactId>rpc-demo-api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${rpc.version}</version>
         </dependency>
         <!--打包时不带，跑单元测试时带-->
         <dependency>
-            <groupId>com.rpc</groupId>
+            <groupId>io.github.chasencode</groupId>
             <artifactId>rpc-demo-provider</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${rpc.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
