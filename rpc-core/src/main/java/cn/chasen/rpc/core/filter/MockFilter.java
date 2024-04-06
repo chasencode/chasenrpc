@@ -8,6 +8,12 @@ import cn.chasen.rpc.core.util.MethodUtils;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+/**
+ * @program: chasenrpc
+ * @description: MockFilter
+ * @author: Chasen
+ * @create: 2024-04-06 22:15
+ **/
 public class MockFilter implements Filter {
     @Override
     public Object prefilter(RpcRequest request) {

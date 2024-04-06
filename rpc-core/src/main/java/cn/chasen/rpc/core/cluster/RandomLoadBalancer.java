@@ -7,10 +7,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Description for this class.
- *
- * @create 2024/3/16 19:53
- */
+ * @program: chasenrpc
+ * @description: 随机负载均衡
+ * @author: Chasen
+ * @create: 2024-04-06 22:15
+ **/
 public class RandomLoadBalancer<T> implements LoadBalancer<T> {
 
     Random random = new Random();

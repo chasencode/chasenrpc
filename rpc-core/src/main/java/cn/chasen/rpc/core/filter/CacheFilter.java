@@ -8,12 +8,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Description for this class.
- *
- * @Author : Chasen
- * @create 2024/3/23 20:27
- */
-
+ * @program: chasenrpc
+ * @description: 缓存过滤器
+ * @author: Chasen
+ * @create: 2024-04-06 22:15
+ **/
 public class CacheFilter implements Filter {
 
     // 替换成guava cache，加容量和过期时间 todo 71

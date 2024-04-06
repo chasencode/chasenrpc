@@ -17,7 +17,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import cn.chasen.rpc.core.registry.zk.ZkRegistryCenter;
-
+/**
+ * @program: chasenrpc
+ * @description: 消费者配置加载
+ * @author: Chasen
+ * @create: 2024-04-06 22:15
+ **/
 @Configuration
 @Slf4j
 public class ConsumerConfig {

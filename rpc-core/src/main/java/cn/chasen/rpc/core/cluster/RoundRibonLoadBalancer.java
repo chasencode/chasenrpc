@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Description for this class.
- *
- * @create 2024/3/16 19:53
- */
+ * @program: chasenrpc
+ * @description: 自定义负载均衡
+ * @author: Chasen
+ * @create: 2024-04-06 22:15
+ **/
 public class RoundRibonLoadBalancer<T> implements LoadBalancer<T> {
 
     AtomicInteger index = new AtomicInteger(0);

@@ -1,9 +1,7 @@
 package cn.chasen.rpc.core.util;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
@@ -12,11 +10,11 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 /**
- * Description for this class.
- *
- * @Author :Chasen
- * @create 2024/3/13 20:51
- */
+ * @program: chasenrpc
+ * @description: 类型转换工具
+ * @author: Chasen
+ * @create: 2024-04-06 22:15
+ **/
 @Slf4j
 public class TypeUtils {
 

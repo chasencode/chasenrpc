@@ -6,11 +6,11 @@ import org.apache.curator.test.TestingCluster;
 import org.apache.curator.utils.CloseableUtils;
 
 /**
- * Description for this class.
- *
- * @Author : Chasen
- * @create 2024/3/24 21:03
- */
+ * @program: chasenrpc
+ * @description: 测试ZK 服务
+ * @author: Chasen
+ * @create: 2024-04-06 22:15
+ **/
 public class TestZKServer {
     TestingCluster cluster;
     @SneakyThrows
