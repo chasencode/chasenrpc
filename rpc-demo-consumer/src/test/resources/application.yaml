@@ -10,9 +10,12 @@ rpc:
   zkRoot: rpctest
 
 app:
-  id: apptest
+  id: app1
   namespace: public
   env: dev
+  metas: "{'gray': 'false', 'dc':'bj', 'unit':'B001'}"
+  grayRatio: 10
+  retries: 1
 logging:
   level:
     root: info
