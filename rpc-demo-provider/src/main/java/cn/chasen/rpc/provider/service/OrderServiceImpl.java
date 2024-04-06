@@ -1,4 +1,4 @@
-package cn.chasen.rpc.provider;
+package cn.chasen.rpc.provider.service;
 
 import cn.chasen.rpc.core.annotation.ChasenProvider;
 import cn.chasen.rpc.demo.api.Order;
