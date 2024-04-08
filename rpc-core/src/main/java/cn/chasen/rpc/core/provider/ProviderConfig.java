@@ -6,11 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 import cn.chasen.rpc.core.registry.zk.ZkRegistryCenter;
+import cn.chasen.rpc.core.transport.SpringBootTransport;
 
 @Configuration
 @Slf4j
+@Import({SpringBootTransport.class})
 public class ProviderConfig {
 
     @Bean

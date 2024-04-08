@@ -2,6 +2,7 @@ package cn.chasen.rpc.provider;
 
 import cn.chasen.rpc.core.api.RpcRequest;
 import cn.chasen.rpc.core.api.RpcResponse;
+import cn.chasen.rpc.core.transport.SpringBootTransport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
@@ -30,11 +31,8 @@ public class DemoProviderApplication {
     // 使用 HTTP + JSON 来时间序列化和通信
 
 
-    @RequestMapping("/")
-    public RpcResponse<Object> invoke(@RequestBody RpcRequest request) {
-        return  providerInvoker.invoke(request);
-    }
-
+    @Autowired
+    SpringBootTransport transport;
     @Bean
     ApplicationRunner providerRun() {
         return x -> {
@@ -42,14 +40,14 @@ public class DemoProviderApplication {
             request.setService("cn.chasen.rpc.demo.api.UserService");
             request.setMethodSign("findById@1_int");
             request.setArgs(new Object[]{100});
-            RpcResponse<Object> rpcResponse = providerInvoker.invoke(request);
+            RpcResponse<Object> rpcResponse = transport.invoke(request);
             log.info("return:" + rpcResponse.getData());
 
             RpcRequest request2 = new RpcRequest();
             request2.setService("cn.chasen.rpc.demo.api.UserService");
             request2.setMethodSign("findById@2_int_java.long.long.String");
             request2.setArgs(new Object[]{101, "Chasen"});
-            RpcResponse<Object> rpcResponse2 = providerInvoker.invoke(request);
+            RpcResponse<Object> rpcResponse2 = transport.invoke(request);
             log.info("return2:" + rpcResponse2.getData());
         };
     }
