@@ -26,10 +26,10 @@ public class ZkRegistryCenter implements RegistryCenter {
     private CuratorFramework client = null;
 
 
-    @Value("${rpc.zkServer}")
+    @Value("${chasenrpc.zk.server}")
     String servers;
 
-    @Value("${rpc.zkRoot}")
+    @Value("${chasenrpc.zk.root}")
     String root;
 
     @Override
@@ -64,7 +64,6 @@ public class ZkRegistryCenter implements RegistryCenter {
             log.info(" ===> register to zk: " + instancePath);
             client.create().withMode(CreateMode.EPHEMERAL).forPath(instancePath, instance.toMetas().getBytes());
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RpcException(e);
         }
     }

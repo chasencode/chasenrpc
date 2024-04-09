@@ -1,15 +1,22 @@
 server:
   port: 8081
-rpc:
-  zkServer: 127.0.0.1:2181
-  zkRoot: rpc
 
-app:
-  id: app1
-  namespace: public
-  env: dev
-  metas: "{'gray': 'false', 'dc':'bj', 'unit':'B001'}"
+chasenrpc:
+  zk:
+    server: 127.0.0.1:2181
+    root: chasenrpc
+  app:
+    id: app1
+    namespace: public
+    env: dev
+  provider:
+    metas:
+      dc: bj
+      gray: false
+      unit: B001
+      tc: 25
+
 logging:
   level:
     root: error
-    cn.chasen.rpc: debug
+    cn.chasen.rpc: info

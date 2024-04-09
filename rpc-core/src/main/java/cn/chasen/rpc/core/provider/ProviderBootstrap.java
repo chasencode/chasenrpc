@@ -2,6 +2,8 @@ package cn.chasen.rpc.core.provider;
 
 import cn.chasen.rpc.core.annotation.ChasenProvider;
 import cn.chasen.rpc.core.api.RegistryCenter;
+import cn.chasen.rpc.core.config.AppConfigProperties;
+import cn.chasen.rpc.core.config.ProviderConfigProperties;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.Data;
@@ -26,7 +28,7 @@ import java.util.Map;
 @Slf4j
 public class  ProviderBootstrap implements ApplicationContextAware {
 
-    ApplicationContext applicationContext;
+    private ApplicationContext applicationContext;
 
     private MultiValueMap<String, ProviderMeta> skeleton = new LinkedMultiValueMap<>();
 
@@ -34,21 +36,18 @@ public class  ProviderBootstrap implements ApplicationContextAware {
 
     private RegistryCenter rc;
 
-    @Value("${server.port}")
     private String port;
 
-    @Value("${app.id}")
-    private String app;
+    private AppConfigProperties appProperties;
 
-    @Value("${app.namespace}")
-    private String namespace;
+    private ProviderConfigProperties providerProperties;
 
-    @Value("${app.env}")
-    private String env;
-
-
-    @Value("#{${app.metas}}")
-    private Map<String, String> metas;
+    public ProviderBootstrap(String port, AppConfigProperties appProperties,
+                             ProviderConfigProperties providerProperties) {
+        this.port = port;
+        this.appProperties = appProperties;
+        this.providerProperties = providerProperties;
+    }
 
     @PostConstruct
     public void init() {
@@ -61,15 +60,14 @@ public class  ProviderBootstrap implements ApplicationContextAware {
     public void start() {
         try {
             String ip = InetAddress.getLocalHost().getHostAddress();
-            instance = InstanceMeta.http(ip, Integer.valueOf(port));
-            instance.getParameters().putAll(this.metas);
-            log.info("provider start instance ={}", instance);
+            instance = InstanceMeta.http(ip, Integer.valueOf(port)).addParams(providerProperties.getMetas());
             rc.start();
+            skeleton.keySet().forEach(this::registerService); // zk有了， 但spring 还未注册完成
         } catch (UnknownHostException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-        skeleton.keySet().forEach(this::registerService); // zk有了， 但spring 还未注册完成
+
     }
 
     @PreDestroy
@@ -81,14 +79,14 @@ public class  ProviderBootstrap implements ApplicationContextAware {
 
     private void registerService(String service) {
         ServiceMeta serviceMeta = ServiceMeta.builder()
-                .app(app).namespace(namespace).env(env).name(service).build();
+                .app(appProperties.getId()).namespace(appProperties.getNamespace()).env(appProperties.getEnv()).name(service).build();
         rc.register(serviceMeta, instance);
     }
 
 
     private void unregisterService(String service) {
         ServiceMeta serviceMeta = ServiceMeta.builder()
-                .app(app).namespace(namespace).env(env).name(service).build();
+                .app(appProperties.getId()).namespace(appProperties.getNamespace()).env(appProperties.getEnv()).name(service).build();
         rc.unregister(serviceMeta, instance);
     }
 

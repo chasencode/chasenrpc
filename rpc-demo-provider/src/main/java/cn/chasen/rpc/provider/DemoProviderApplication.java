@@ -2,6 +2,7 @@ package cn.chasen.rpc.provider;
 
 import cn.chasen.rpc.core.api.RpcRequest;
 import cn.chasen.rpc.core.api.RpcResponse;
+import cn.chasen.rpc.core.config.ProviderConfig;
 import cn.chasen.rpc.core.transport.SpringBootTransport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +11,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import cn.chasen.rpc.core.provider.ProviderConfig;
 import cn.chasen.rpc.core.provider.ProviderInvoker;
 
 @SpringBootApplication

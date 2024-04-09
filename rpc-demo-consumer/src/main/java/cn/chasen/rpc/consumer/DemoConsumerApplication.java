@@ -2,8 +2,7 @@ package cn.chasen.rpc.consumer;
 
 import cn.chasen.rpc.core.annotation.ChasenConsumer;
 import cn.chasen.rpc.core.api.RpcContext;
-import cn.chasen.rpc.core.cluster.GrayRouter;
-import cn.chasen.rpc.core.consuemer.ConsumerConfig;
+import cn.chasen.rpc.core.config.ConsumerConfig;
 import cn.chasen.rpc.demo.api.User;
 import cn.chasen.rpc.demo.api.UserService;
 import lombok.extern.slf4j.Slf4j;

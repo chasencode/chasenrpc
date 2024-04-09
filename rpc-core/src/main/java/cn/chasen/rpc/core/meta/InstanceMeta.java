@@ -28,6 +28,12 @@ public class InstanceMeta {
         this.context = context;
     }
 
+
+    public InstanceMeta addParams(Map<String, String> params) {
+        this.getParameters().putAll(params);
+        return this;
+    }
+
     public String toPath() {
         return String.format("%s_%d", host, port);
     }

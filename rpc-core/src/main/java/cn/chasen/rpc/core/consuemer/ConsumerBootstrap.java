@@ -27,6 +27,7 @@ import java.util.Map;
  */
 @Data
 @Slf4j
+
 public class ConsumerBootstrap implements ApplicationContextAware {
 
     ApplicationContext applicationContext;
@@ -36,30 +37,11 @@ public class ConsumerBootstrap implements ApplicationContextAware {
 
     Environment environment;
 
-    @Value("${app.id}")
-    private String app;
-
-    @Value("${app.namespace}")
-    private String namespace;
-
-    @Value("${app.env}")
-    private String env;
-
-    @Value("${app.retries}")
-    private String retries;
-
 
 
     public void start() {
-
-        Router<InstanceMeta> router = applicationContext.getBean(Router.class);
-        RoundRibonLoadBalancer<InstanceMeta> loadBalancer = applicationContext.getBean(RoundRibonLoadBalancer.class);
-        List<Filter> filters = applicationContext.getBeansOfType(Filter.class).values().stream().toList();
-        RpcContext context = new RpcContext();
-        context.setRouter(router);
-        context.setLoadBalancer(loadBalancer);
-        context.setFilters(filters);
-        context.getParameters().put("app.retries", String.valueOf(retries));
+        // 需要注意，现在的context 是全局的，如果需要每个服务（请求）有自己的参数，需要增加clone
+        RpcContext context = applicationContext.getBean(RpcContext.class);
         RegistryCenter rc = applicationContext.getBean(RegistryCenter.class);
         String[] beanDefinitionNames = applicationContext.getBeanDefinitionNames();
         for (String beanDefinitionName : beanDefinitionNames) {
@@ -89,10 +71,11 @@ public class ConsumerBootstrap implements ApplicationContextAware {
 
     private Object createFromRegistry(Class<?> service, RpcContext context, RegistryCenter rc) {
         ServiceMeta serviceMeta = ServiceMeta.builder()
-                .app(app).namespace(namespace).env(env).name(service.getCanonicalName()).build();
+                .app(context.param("app.id")).namespace(context.param("app.namespace"))
+                .env(context.param("app.env")).name(service.getCanonicalName()).build();
         List<InstanceMeta> providers = rc.fetchAll(serviceMeta);
         log.info("===》 map to provider");
-
+        //  @todo 这里是全部清除，会有问题，需要修改
         rc.subscribe(serviceMeta, event -> {
             providers.clear();
             providers.addAll(event.getData());
