@@ -2,6 +2,7 @@ package cn.chasen.rpc.provider;
 
 import cn.chasen.rpc.core.api.RpcRequest;
 import cn.chasen.rpc.core.api.RpcResponse;
+import cn.chasen.rpc.core.config.ApolloChangedListener;
 import cn.chasen.rpc.core.config.ProviderConfig;
 import cn.chasen.rpc.core.transport.SpringBootTransport;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,12 @@ public class DemoProviderApplication {
 
     @Autowired
     ProviderInvoker providerInvoker;
+
+
+    @Bean
+    ApolloChangedListener apolloChangedListener() {
+        return new ApolloChangedListener();
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(DemoProviderApplication.class, args);

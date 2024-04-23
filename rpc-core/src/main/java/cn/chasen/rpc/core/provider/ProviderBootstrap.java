@@ -104,8 +104,11 @@ public class  ProviderBootstrap implements ApplicationContextAware {
     }
 
     private void createProvider(Class<?> anInterface, Object impl, Method method) {
-        ProviderMeta providerMeta = ProviderMeta.builder().method(method)
-                .serviceImpl(impl).methodSign(MethodUtils.methodSign(method)).build();
+        ProviderMeta providerMeta = ProviderMeta.builder()
+                .method(method)
+                .serviceImpl(impl)
+                .methodSign(MethodUtils.methodSign(method))
+                .build();
         log.info(" create a provider: " + providerMeta);
         skeleton.add(anInterface.getCanonicalName(), providerMeta);
     }

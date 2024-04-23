@@ -1,6 +1,7 @@
 package cn.chasen.rpc.core.config;
 
 import lombok.Data;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,7 +16,6 @@ import java.util.Map;
  */
 
 @Data
-@Configuration
 @ConfigurationProperties(prefix = "chasenrpc.provider")
 public class ProviderConfigProperties {
 
@@ -23,5 +23,7 @@ public class ProviderConfigProperties {
 
     Map<String, String> metas = new HashMap<>();
 
+    @Setter
+    String test;
 
 }

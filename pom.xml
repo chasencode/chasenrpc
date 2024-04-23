@@ -28,6 +28,7 @@
         <curator-client.version>5.1.0</curator-client.version>
         <curator-recipes.version>5.1.0</curator-recipes.version>
         <curator-test.version>5.1.0</curator-test.version>
+        <apollo.version>2.2.0</apollo.version>
     </properties>
 
     <licenses>
@@ -92,6 +93,18 @@
                 <version>${curator-test.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.ctrip.framework.apollo</groupId>
+                <artifactId>apollo-mockserver</artifactId>
+                <version>${apollo.version}</version>
+                <scope>test</scope>
+                <!--            <exclusions>-->
+                <!--                <exclusion>-->
+                <!--                    <groupId>junit</groupId>-->
+                <!--                    <artifactId>junit</artifactId>-->
+                <!--                </exclusion>-->
+                <!--            </exclusions>-->
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

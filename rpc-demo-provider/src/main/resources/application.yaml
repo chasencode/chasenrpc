@@ -20,3 +20,16 @@ logging:
   level:
     root: error
     cn.chasen.rpc: info
+
+app:
+  id: app1
+apollo:
+  cacheDir: /Users/chasen/app/apollo/apollo-quick-start-2.2.0/data/
+  cluster: default
+  meta: http://localhost:8080
+  autoUpdateInjectedSpringProperties: true
+  bootstrap:
+    enabled: true
+    namespaces: application
+    eagerLoad:
+      enabled: false
