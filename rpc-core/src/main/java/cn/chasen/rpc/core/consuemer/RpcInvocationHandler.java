@@ -136,7 +136,7 @@ public class RpcInvocationHandler implements InvocationHandler {
                         return filterResult;
                     }
                 }
-
+                return result;
             } catch (RuntimeException ex) {
                 if (!(ex.getCause() instanceof SocketTimeoutException)) {
                     throw ex;
