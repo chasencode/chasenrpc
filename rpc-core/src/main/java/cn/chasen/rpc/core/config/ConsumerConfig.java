@@ -4,11 +4,15 @@ import cn.chasen.rpc.core.api.*;
 import cn.chasen.rpc.core.cluster.GrayRouter;
 import cn.chasen.rpc.core.cluster.RoundRibonLoadBalancer;
 import cn.chasen.rpc.core.consuemer.ConsumerBootstrap;
+import cn.chasen.rpc.core.filter.ContextParameterFilter;
 import cn.chasen.rpc.core.filter.ParameterFilter;
 import lombok.extern.slf4j.Slf4j;
 import cn.chasen.rpc.core.meta.InstanceMeta;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -25,12 +29,11 @@ import java.util.List;
  **/
 @Configuration
 @Slf4j
-@Import({ConsumerProperties.class, AppConfigProperties.class})
+@Import({AppProperties.class, ConsumerProperties.class})
 public class ConsumerConfig {
 
-
     @Autowired
-    AppConfigProperties appConfigProperties;
+    AppProperties appProperties;
 
     @Autowired
     ConsumerProperties consumerProperties;
@@ -41,13 +44,22 @@ public class ConsumerConfig {
         return new ConsumerBootstrap();
     }
 
+
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "apollo.bootstrap", value = "enabled")
+    ApolloChangedListener consumer_apolloChangedListener() {
+        return new ApolloChangedListener();
+    }
+
     /**
      * ApplicationRunner 所有 上下文初始化完毕后才会执行
      * @param consumerBootstrap
      * @return
      */
     @Bean
-    @Order(Integer.MIN_VALUE + 2)
+    @Order(Integer.MIN_VALUE + 1)
     public ApplicationRunner consumerBootstrapRunner(@Autowired ConsumerBootstrap consumerBootstrap) {
         return x-> {
            log.info("consumerBootstrap starting ...");

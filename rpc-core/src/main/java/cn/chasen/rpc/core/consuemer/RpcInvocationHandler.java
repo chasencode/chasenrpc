@@ -39,7 +39,7 @@ public class RpcInvocationHandler implements InvocationHandler {
 
     private List<InstanceMeta> isolatedProviders = new ArrayList<>();
     private List<InstanceMeta> halfOpenProviders = new ArrayList<>();
-    HttpInvoker httpInvoker = new OkHttpInvoker();
+    HttpInvoker httpInvoker = new OkHttpInvoker(500);
 
     Map<String, SlidingTimeWindow> windows = new HashMap<>();
 
@@ -158,12 +158,12 @@ public class RpcInvocationHandler implements InvocationHandler {
 
     private static Object castReturnResult(Method method, RpcResponse<?> rpcResponse) {
         if (rpcResponse.isStatus()) {
-            Object data = rpcResponse.getData();
-            return TypeUtils.castMethodResult(method, data);
+            return TypeUtils.castMethodResult(method, rpcResponse.getData());
         } else {
-            RpcException ex = rpcResponse.getEx();
-            if (ex != null) {
-                throw ex;
+            RpcException exception = rpcResponse.getEx();
+            if(exception != null) {
+                log.error("response error.", exception);
+                throw exception;
             }
             return null;
         }

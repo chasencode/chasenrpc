@@ -61,23 +61,23 @@ public class DemoConsumerApplication {
     }
 
     private void testAll() {
-        // 常规int类型，返回User对象
-        System.out.println("Case 1. >>===[常规int类型，返回User对象]===");
-        User user = userService.findById(1);
-        System.out.println("RPC result userService.findById(1) = " + user);
-
-        // 测试方法重载，同名方法，参数不同
-        System.out.println("Case 2. >>===[测试方法重载，同名方法，参数不同===");
-        User user1 = userService.findById(1, "hubao");
-        System.out.println("RPC result userService.findById(1, \"hubao\") = " + user1);
-
-        // 测试返回字符串
-        System.out.println("Case 3. >>===[测试返回字符串]===");
-        System.out.println("userService.getName() = " + userService.getName());
-
-        // 测试重载方法返回字符串
-        System.out.println("Case 4. >>===[测试重载方法返回字符串]===");
-        System.out.println("userService.getName(123) = " + userService.getName(123));
+//        // 常规int类型，返回User对象
+//        System.out.println("Case 1. >>===[常规int类型，返回User对象]===");
+//        User user = userService.findById(1);
+//        System.out.println("RPC result userService.findById(1) = " + user);
+//
+//        // 测试方法重载，同名方法，参数不同
+//        System.out.println("Case 2. >>===[测试方法重载，同名方法，参数不同===");
+//        User user1 = userService.findById(1, "hubao");
+//        System.out.println("RPC result userService.findById(1, \"hubao\") = " + user1);
+//
+//        // 测试返回字符串
+//        System.out.println("Case 3. >>===[测试返回字符串]===");
+//        System.out.println("userService.getName() = " + userService.getName());
+//
+//        // 测试重载方法返回字符串
+//        System.out.println("Case 4. >>===[测试重载方法返回字符串]===");
+//        System.out.println("userService.getName(123) = " + userService.getName(123));
 
         // 测试local toString方法
 //        System.out.println("Case 5. >>===[测试local toString方法]===");

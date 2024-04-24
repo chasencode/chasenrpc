@@ -80,6 +80,7 @@ public class TypeUtils {
         return null;
     }
 
+
     public static Object castMethodResult(Method method, Object data) {
         log.debug("castMethodResult: method = " + method);
         log.debug("castMethodResult: data = " + data);
@@ -87,6 +88,7 @@ public class TypeUtils {
         Type genericReturnType = method.getGenericReturnType();
         return castGeneric(data, type, genericReturnType);
     }
+
 
     public static Object castGeneric(Object data, Class<?> type, Type genericReturnType) {
         log.debug("castGeneric: data = " + data);
