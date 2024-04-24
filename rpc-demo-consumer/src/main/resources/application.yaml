@@ -17,6 +17,8 @@ chasenrpc:
     halfOpenInitialDelay: 10000
     halfOpenDelay: 60000
 
+ck:
+  servers: http://127.0.0.1:8484
 
 logging:
   level:

@@ -6,6 +6,7 @@ import cn.chasen.rpc.core.cluster.RoundRibonLoadBalancer;
 import cn.chasen.rpc.core.consuemer.ConsumerBootstrap;
 import cn.chasen.rpc.core.filter.ContextParameterFilter;
 import cn.chasen.rpc.core.filter.ParameterFilter;
+import cn.chasen.rpc.core.registry.ck.ChasenRegistryCenter;
 import lombok.extern.slf4j.Slf4j;
 import cn.chasen.rpc.core.meta.InstanceMeta;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +82,7 @@ public class ConsumerConfig {
 
     @Bean(initMethod = "start", destroyMethod = "stop")
     public RegistryCenter consumerRc() {
-        return new ZkRegistryCenter();
+        return new ChasenRegistryCenter();
     }
 
     /**

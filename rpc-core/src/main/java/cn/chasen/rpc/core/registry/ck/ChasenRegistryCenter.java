@@ -10,6 +10,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,40 +32,48 @@ public class ChasenRegistryCenter implements RegistryCenter {
     @Value("${ck.servers}")
     private String servers;
 
+
+    Map<String, Long> VERSIONS = new HashMap<>();
+    ScheduledExecutorService consumerExecutor;
+    ScheduledExecutorService providerExecutor;
+    MultiValueMap<InstanceMeta, ServiceMeta> renews = new LinkedMultiValueMap<>();
+
     @Override
     public void start() {
         log.info("====>>> [CkRegistry] : start with server : {}", servers);
-        executor = Executors.newScheduledThreadPool(1);
+        consumerExecutor = Executors.newScheduledThreadPool(1);
+        providerExecutor = Executors.newScheduledThreadPool(1);
+        providerExecutor.scheduleAtFixedRate(() -> {
+            renews.keySet().forEach(instanceMeta -> {
+                String services = String.join( ",", renews.get(instanceMeta).stream().map(ServiceMeta::toPath).toList());
+                Long timeStamp = HttpInvoker.httpPost(JSON.toJSONString(instanceMeta), servers + "/renews?services=" + services, Long.class);
+                log.debug("====>>> [CkRegistry] : renews instance {} for services {} with timestamp {}", instanceMeta, services, timeStamp);
+            });
+        }, 5, 5, TimeUnit.SECONDS);
     }
 
     @Override
     public void stop() {
         log.info("====>>> [CkRegistry] : stop with server : {}", servers);
-        executor.shutdown();
-        try {
-            executor.awaitTermination(1, TimeUnit.SECONDS);
-            if (!executor.isTerminated()) {
-                executor.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            log.error("====>>> [CkRegistry] : stop error", e);
-        }
+        gracefulShutdown(consumerExecutor);
+        gracefulShutdown(providerExecutor);
     }
 
     @Override
     public void register(ServiceMeta service, InstanceMeta instance) {
         log.info("====>>> [CkRegistry] : register instance {} for {}", instance, service);
-        HttpInvoker.httpPost(JSON.toJSONString(instance), servers + "/reg?service=" +service.toPath(), InstanceMeta.class);
+        HttpInvoker.httpPost(JSON.toJSONString(instance), servers + "/reg?service=" + service.toPath(), InstanceMeta.class);
         log.info("====>>> [CkRegistry] : registered  {}", instance);
+        renews.add(instance, service);
 
     }
 
     @Override
     public void unregister(ServiceMeta service, InstanceMeta instance) {
         log.info("====>>> [CkRegistry] : unregister instance {} for {}", instance, service);
-        HttpInvoker.httpPost(JSON.toJSONString(instance), servers + "/unreg?service=" +service.toPath(), InstanceMeta.class);
+        HttpInvoker.httpPost(JSON.toJSONString(instance), servers + "/unreg?service=" + service.toPath(), InstanceMeta.class);
         log.info("====>>> [CkRegistry] : unregistered  {}", instance);
-
+        renews.remove(instance, service);
     }
 
     @Override
@@ -75,12 +85,10 @@ public class ChasenRegistryCenter implements RegistryCenter {
         return instanceMetas;
     }
 
-    Map<String, Long> VERSIONS = new HashMap<>();
-    ScheduledExecutorService executor;
 
     @Override
     public void subscribe(ServiceMeta service, ChangedListener listener) {
-        executor.scheduleWithFixedDelay(() -> {
+        consumerExecutor.scheduleWithFixedDelay(() -> {
             try {
                 List<InstanceMeta> instanceMetas = fetchAll(service);
                 if (instanceMetas == null) {
@@ -98,5 +106,18 @@ public class ChasenRegistryCenter implements RegistryCenter {
                 log.error("====>>> [CkRegistry] : subscribe error", e);
             }
         }, 1000, 5000, TimeUnit.MILLISECONDS);
+    }
+
+
+    private void gracefulShutdown(ScheduledExecutorService executor) {
+        executor.shutdown();
+        try {
+            executor.awaitTermination(1, TimeUnit.SECONDS);
+            if (!executor.isTerminated()) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            log.error("====>>> [CkRegistry] : stop error", e);
+        }
     }
 }

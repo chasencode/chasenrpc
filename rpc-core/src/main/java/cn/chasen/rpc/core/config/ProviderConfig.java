@@ -3,6 +3,7 @@ package cn.chasen.rpc.core.config;
 import cn.chasen.rpc.core.api.RegistryCenter;
 import cn.chasen.rpc.core.provider.ProviderBootstrap;
 import cn.chasen.rpc.core.provider.ProviderInvoker;
+import cn.chasen.rpc.core.registry.ck.ChasenRegistryCenter;
 import cn.chasen.rpc.core.registry.zk.ZkRegistryCenter;
 import cn.chasen.rpc.core.transport.SpringBootTransport;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +60,7 @@ public class ProviderConfig {
     @Bean //(initMethod = "start", destroyMethod = "stop")
     @ConditionalOnMissingBean
     public RegistryCenter provider_rc() {
-        return new ZkRegistryCenter();
+        return new ChasenRegistryCenter();
     }
 
 }
