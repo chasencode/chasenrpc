@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "chasenrpc.consumer")
-public class ConsumerConfigProperties {
+public class ConsumerProperties {
 
     // for ha and governance
     private int retries = 1;

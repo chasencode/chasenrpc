@@ -4,12 +4,10 @@ import cn.chasen.rpc.core.api.*;
 import cn.chasen.rpc.core.cluster.GrayRouter;
 import cn.chasen.rpc.core.cluster.RoundRibonLoadBalancer;
 import cn.chasen.rpc.core.consuemer.ConsumerBootstrap;
-import cn.chasen.rpc.core.filter.CacheFilter;
 import cn.chasen.rpc.core.filter.ParameterFilter;
 import lombok.extern.slf4j.Slf4j;
 import cn.chasen.rpc.core.meta.InstanceMeta;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +25,7 @@ import java.util.List;
  **/
 @Configuration
 @Slf4j
-@Import({ConsumerConfigProperties.class, AppConfigProperties.class})
+@Import({ConsumerProperties.class, AppConfigProperties.class})
 public class ConsumerConfig {
 
 
@@ -35,7 +33,7 @@ public class ConsumerConfig {
     AppConfigProperties appConfigProperties;
 
     @Autowired
-    ConsumerConfigProperties consumerConfigProperties;
+    ConsumerProperties consumerProperties;
 
 
     @Bean
@@ -49,7 +47,7 @@ public class ConsumerConfig {
      * @return
      */
     @Bean
-    @Order(Integer.MIN_VALUE)
+    @Order(Integer.MIN_VALUE + 2)
     public ApplicationRunner consumerBootstrapRunner(@Autowired ConsumerBootstrap consumerBootstrap) {
         return x-> {
            log.info("consumerBootstrap starting ...");
@@ -66,7 +64,7 @@ public class ConsumerConfig {
 
     @Bean
     public Router<InstanceMeta> router() {
-        return new GrayRouter(consumerConfigProperties.getGrayRatio());
+        return new GrayRouter(consumerProperties.getGrayRatio());
     }
 
     @Bean(initMethod = "start", destroyMethod = "stop")
@@ -79,28 +77,25 @@ public class ConsumerConfig {
      * @return filter
      */
     @Bean
-    public Filter filter() {
-        return new ParameterFilter();
+    public Filter defaultFilter() {
+        return new ContextParameterFilter();
     }
 
 
 
     @Bean
+    @RefreshScope // context.refresh
     public RpcContext createContext(@Autowired Router router,
                                     @Autowired LoadBalancer loadBalancer,
                                     @Autowired List<Filter> filters) {
-        RpcContext context = new RpcContext();
+       RpcContext context = new RpcContext();
         context.setRouter(router);
         context.setLoadBalancer(loadBalancer);
         context.setFilters(filters);
-        context.getParameters().put("app.id", appConfigProperties.getId());
-        context.getParameters().put("app.namespace", appConfigProperties.getNamespace());
-        context.getParameters().put("app.env", appConfigProperties.getEnv());
-        context.getParameters().put("consumer.retries", String.valueOf(consumerConfigProperties.getRetries()));
-        context.getParameters().put("consumer.timeout", String.valueOf(consumerConfigProperties.getTimeout()));
-        context.getParameters().put("consumer.faultLimit", String.valueOf(consumerConfigProperties.getFaultLimit()));
-        context.getParameters().put("consumer.halfOpenInitialDelay", String.valueOf(consumerConfigProperties.getHalfOpenInitialDelay()));
-        context.getParameters().put("consumer.halfOpenDelay", String.valueOf(consumerConfigProperties.getHalfOpenDelay()));
+        context.getParameters().put("app.id", appProperties.getId());
+        context.getParameters().put("app.namespace", appProperties.getNamespace());
+        context.getParameters().put("app.env", appProperties.getEnv());
+        context.setConsumerProperties(consumerProperties);
         return context;
     }
 }

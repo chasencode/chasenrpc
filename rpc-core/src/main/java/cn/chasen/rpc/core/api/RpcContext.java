@@ -1,5 +1,6 @@
 package cn.chasen.rpc.core.api;
 
+import cn.chasen.rpc.core.config.ConsumerProperties;
 import cn.chasen.rpc.core.meta.InstanceMeta;
 import lombok.Data;
 
@@ -29,6 +30,8 @@ public class RpcContext {
         }
     };
 
+    private ConsumerProperties consumerProperties;
+
 
     public static void setContextParameter(String key, String value) {
         ContextParameters.get().put(key, value);
@@ -42,7 +45,11 @@ public class RpcContext {
         ContextParameters.get().remove(key);
     }
 
+    public ConsumerProperties getConsumerProperties() {
+        return consumerProperties;
+    }
 
-
-
+    public void setConsumerProperties(ConsumerProperties consumerProperties) {
+        this.consumerProperties = consumerProperties;
+    }
 }

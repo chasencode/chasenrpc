@@ -3,7 +3,7 @@ package cn.chasen.rpc.core.provider;
 import cn.chasen.rpc.core.annotation.ChasenProvider;
 import cn.chasen.rpc.core.api.RegistryCenter;
 import cn.chasen.rpc.core.config.AppConfigProperties;
-import cn.chasen.rpc.core.config.ProviderConfigProperties;
+import cn.chasen.rpc.core.config.ProviderProperties;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.Data;
@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import cn.chasen.rpc.core.meta.InstanceMeta;
 import cn.chasen.rpc.core.meta.ProviderMeta;
 import cn.chasen.rpc.core.meta.ServiceMeta;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.LinkedMultiValueMap;
@@ -40,10 +39,10 @@ public class  ProviderBootstrap implements ApplicationContextAware {
 
     private AppConfigProperties appProperties;
 
-    private ProviderConfigProperties providerProperties;
+    private ProviderProperties providerProperties;
 
     public ProviderBootstrap(String port, AppConfigProperties appProperties,
-                             ProviderConfigProperties providerProperties) {
+                             ProviderProperties providerProperties) {
         this.port = port;
         this.appProperties = appProperties;
         this.providerProperties = providerProperties;

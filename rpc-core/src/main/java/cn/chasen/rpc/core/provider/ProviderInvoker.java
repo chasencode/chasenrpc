@@ -3,7 +3,7 @@ package cn.chasen.rpc.core.provider;
 import cn.chasen.rpc.core.api.RpcContext;
 import cn.chasen.rpc.core.api.RpcRequest;
 import cn.chasen.rpc.core.api.RpcResponse;
-import cn.chasen.rpc.core.config.ProviderConfigProperties;
+import cn.chasen.rpc.core.config.ProviderProperties;
 import cn.chasen.rpc.core.exception.RpcException;
 import cn.chasen.rpc.core.meta.ProviderMeta;
 import cn.chasen.rpc.core.util.SlidingTimeWindow;
@@ -27,7 +27,7 @@ public class ProviderInvoker {
 
     final Map<String, SlidingTimeWindow> windows = new HashMap<>();
 
-    final ProviderConfigProperties providerProperties;
+    final ProviderProperties providerProperties;
 
     public ProviderInvoker(ProviderBootstrap providerBootstrap) {
         this.skeleton = providerBootstrap.getSkeleton();

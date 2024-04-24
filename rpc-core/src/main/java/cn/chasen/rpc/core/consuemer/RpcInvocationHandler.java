@@ -50,7 +50,10 @@ public class RpcInvocationHandler implements InvocationHandler {
         this.context = context;
         this.providers = providers;
         this.executor = Executors.newScheduledThreadPool(1);
-        this.executor.scheduleWithFixedDelay(this::halfOpen, 10, 60, TimeUnit.SECONDS);
+        int halfOpenInitialDelay = context.getConsumerProperties().getHalfOpenInitialDelay();
+        int halfOpenDelay = context.getConsumerProperties().getHalfOpenDelay();
+        this.executor.scheduleWithFixedDelay(this::halfOpen, halfOpenInitialDelay,
+                halfOpenDelay, TimeUnit.MILLISECONDS);
     }
 
     private void halfOpen() {
@@ -62,12 +65,18 @@ public class RpcInvocationHandler implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
+
+        if (MethodUtils.checkLocalMethod(method.getName())) {
+            return null;
+        }
+
         RpcRequest request = new RpcRequest();
         request.setService(service.getCanonicalName());
         request.setMethodSign(MethodUtils.methodSign(method));
         request.setArgs(args);
 
-        int retries = Integer.parseInt(context.getParameters().getOrDefault("app.retries", "1"));
+        int retries =  context.getConsumerProperties().getRetries();
+        int faultLimit = context.getConsumerProperties().getFaultLimit();
 
         while (retries --> 0) {
             try {
@@ -90,35 +99,42 @@ public class RpcInvocationHandler implements InvocationHandler {
                         log.debug("check alive instance ===> {}", instanceMeta);
                     }
                 }
+                RpcResponse<?> rpcResponse;
+                Object result;
 
                 String url = instanceMeta.toUrl();
 
                 try {
-                    RpcResponse<?> rpcResponse = httpInvoker.post(request, url);
-                    Object result = castReturnResult(method, rpcResponse);
+                    rpcResponse = httpInvoker.post(request, url);
+                    result = castReturnResult(method, rpcResponse);
+                } catch (Exception e) {
+                    // 故障的规则统计和隔离，
+                    // 每一次异常，记录一次，统计30s的异常数。
+                    synchronized (windows) {
+                        SlidingTimeWindow window = windows.computeIfAbsent(url, k -> new SlidingTimeWindow());
+                        window.record(System.currentTimeMillis());
+                        log.debug("instance {} in window with {}", url, window.getSum());
+                        if (window.getSum() >= faultLimit) {
+                            isolate(instanceMeta);
+                        }
+                    }
+                    throw e;
+                }
+
+                synchronized ((providers)) {
+                    if (!providers.contains(instanceMeta)) {
+                        isolatedProviders.remove(instanceMeta);
+                        providers.add(instanceMeta);
+                        log.debug("instance {} is recovered, isolatedProviders={}, providers={}",instanceMeta, isolatedProviders, providers);
+                    }
+                }
+
+
                 for (Filter filter : this.context.getFilters()) {
                     Object filterResult = filter.postfilter(request, rpcResponse, result);
                     if(filterResult != null) {
                         return filterResult;
                     }
-                }
-                    return result;
-                } catch (Exception e) {
-                    SlidingTimeWindow window = windows.computeIfAbsent(url, k -> new SlidingTimeWindow());
-                    window.record(System.currentTimeMillis());
-                    if (window.getSum() >= 10) {
-                        isolate(instanceMeta);
-                    }
-
-                    synchronized ((providers)) {
-                        if (!providers.contains(instanceMeta)) {
-                            isolatedProviders.remove(instanceMeta);
-                            providers.add(instanceMeta);
-                            log.debug("instance {} is recovered, isolatedProviders={}, providers={}",instanceMeta, isolatedProviders, providers);
-                        }
-                    }
-
-                    throw e;
                 }
 
             } catch (RuntimeException ex) {
@@ -127,9 +143,6 @@ public class RpcInvocationHandler implements InvocationHandler {
                 }
             }
         }
-
-
-
         return null;
 
     }
