@@ -40,28 +40,21 @@ public class ChasenRegistryCenter implements RegistryCenter {
     private static final String RENWS_PATH = "/renews";
 
     Map<String, Long> VERSIONS = new HashMap<>();
-    ScheduledExecutorService consumerExecutor;
-    ScheduledExecutorService providerExecutor;
     MultiValueMap<InstanceMeta, ServiceMeta> renews = new LinkedMultiValueMap<>();
+
+    ChasenHealthChecker healthChecker = new ChasenHealthChecker();
 
     @Override
     public void start() {
         log.info("====>>> [CkRegistry] : start with server : {}", servers);
-        consumerExecutor = Executors.newScheduledThreadPool(1);
-        providerExecutor = Executors.newScheduledThreadPool(1);
-        providerExecutor.scheduleAtFixedRate(() -> {
-            renews.keySet().forEach(instanceMeta -> {
-                Long timeStamp = HttpInvoker.httpPost(JSON.toJSONString(instanceMeta), renewsPath(renews.get(instanceMeta)), Long.class);
-                log.debug("====>>> [CkRegistry] : renews instance {}  with timestamp {}", instanceMeta, timeStamp);
-            });
-        }, 5, 5, TimeUnit.SECONDS);
+        healthChecker.start();
+        providerCheck();
     }
 
     @Override
     public void stop() {
         log.info("====>>> [CkRegistry] : stop with server : {}", servers);
-        gracefulShutdown(consumerExecutor);
-        gracefulShutdown(providerExecutor);
+        healthChecker.stop();
     }
 
     @Override
@@ -95,24 +88,20 @@ public class ChasenRegistryCenter implements RegistryCenter {
 
     @Override
     public void subscribe(ServiceMeta service, ChangedListener listener) {
-        consumerExecutor.scheduleWithFixedDelay(() -> {
-            try {
-                List<InstanceMeta> instanceMetas = fetchAll(service);
-                if (instanceMetas == null) {
-                    return;
-                }
-                long version = VERSIONS.getOrDefault(service.toPath(), -1L);
-                Long newVersion = HttpInvoker.httpGet(versionPath(service), Long.class);
-                log.info("====>>> [CkRegistry] :  version {}, newVersion {}", version, newVersion);
-                if (newVersion > version) {
-                    List<InstanceMeta> instanceMetaList = fetchAll(service);
-                    listener.fire(new Event(instanceMetaList));
-                    VERSIONS.put(service.toPath(), newVersion);
-                }
-            } catch (Exception e) {
-                log.error("====>>> [CkRegistry] : subscribe error", e);
+        healthChecker.consumerCheck( () -> {
+            List<InstanceMeta> instanceMetas = fetchAll(service);
+            if (instanceMetas == null) {
+                return;
             }
-        }, 1000, 5000, TimeUnit.MILLISECONDS);
+            Long version = VERSIONS.getOrDefault(service.toPath(), -1L);
+            Long newVersion = HttpInvoker.httpGet(versionPath(service), Long.class);
+            log.info(" ====>>>> [CkRegistry] : version = {}, newVersion = {}", version, newVersion);
+            if(newVersion > version) {
+                List<InstanceMeta> instances = fetchAll(service);
+                listener.fire(new Event(instances));
+                VERSIONS.put(service.toPath(), newVersion);
+            }
+        });
     }
 
     private String versionPath(ServiceMeta service) {
@@ -155,5 +144,18 @@ public class ChasenRegistryCenter implements RegistryCenter {
         } catch (InterruptedException e) {
             log.error("====>>> [CkRegistry] : stop error", e);
         }
+    }
+
+
+    public void providerCheck() {
+        healthChecker.providerCheck(() -> {
+            renews.keySet().stream().forEach(
+                    instance -> {
+                        Long timestamp = HttpInvoker.httpPost(JSON.toJSONString(instance),
+                                renewsPath(renews.get(instance)), Long.class);
+                        log.info(" ====>>>> [CkRegistry] : renew instance {} at {}", instance, timestamp);
+                    }
+            );
+        });
     }
 }
