@@ -12,3 +12,13 @@ GET http://127.0.0.1:8088/findById/?id=101
 
 ### 通过8088调用超时接口
 GET http://127.0.0.1:8088/find/?timeout=1100
+
+### 通过8081调用配置项
+GET http://localhost:8081/metas
+
+{
+chasenrpc.consumer.retries=2
+chasenrpc.consumer.timeout=1000
+chasenrpc.consumer.grayRatio=33
+chasenrpc.consumer.faultLimit=10
+}

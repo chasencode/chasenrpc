@@ -1,5 +1,6 @@
 package cn.chasen.rpc.core.config;
 
+import io.github.chasencode.csconfigclient.annoation.EnableCSConfig;
 import lombok.Data;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -16,6 +17,7 @@ import java.util.Map;
 
 @Data
 @ConfigurationProperties(prefix = "chasenrpc.provider")
+@EnableCSConfig
 public class ProviderProperties {
 
     // for provider

@@ -4,6 +4,7 @@ import cn.chasen.rpc.core.api.RpcRequest;
 import cn.chasen.rpc.core.api.RpcResponse;
 import cn.chasen.rpc.core.config.ApolloChangedListener;
 import cn.chasen.rpc.core.config.ProviderConfig;
+import cn.chasen.rpc.core.config.ProviderProperties;
 import cn.chasen.rpc.core.transport.SpringBootTransport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import cn.chasen.rpc.core.provider.ProviderInvoker;
 
@@ -34,7 +36,14 @@ public class DemoProviderApplication {
         SpringApplication.run(DemoProviderApplication.class, args);
     }
     // 使用 HTTP + JSON 来时间序列化和通信
+    @Autowired
+    ProviderProperties providerProperties;
 
+    @RequestMapping("/metas")
+    public String meta() {
+        System.out.println(System.identityHashCode(providerProperties.getMetas()));
+        return providerProperties.getMetas().toString();
+    }
 
     @Autowired
     SpringBootTransport transport;

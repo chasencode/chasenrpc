@@ -1,5 +1,6 @@
 package cn.chasen.rpc.core.config;
 
+import io.github.chasencode.csconfigclient.annoation.EnableCSConfig;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "chasenrpc.consumer")
+@EnableCSConfig
 public class ConsumerProperties {
 
     // for ha and governance
