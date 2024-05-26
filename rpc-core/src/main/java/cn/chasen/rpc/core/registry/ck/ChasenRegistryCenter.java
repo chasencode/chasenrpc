@@ -60,6 +60,8 @@ public class ChasenRegistryCenter implements RegistryCenter {
     @Override
     public void register(ServiceMeta service, InstanceMeta instance) {
         log.info("====>>> [CkRegistry] : register instance {} for {}", instance, service);
+        log.info("====>>> [CkRegistry] : register path {}", regPath(service));
+
         HttpInvoker.httpPost(JSON.toJSONString(instance), regPath(service), InstanceMeta.class);
         log.info("====>>> [CkRegistry] : registered  {}", instance);
         renews.add(instance, service);
@@ -131,7 +133,7 @@ public class ChasenRegistryCenter implements RegistryCenter {
     }
 
     private String path(String context, ServiceMeta service) {
-        return servers + context + "?service=" + service;
+        return servers + context + "?service=" + service.toPath();
     }
 
     private void gracefulShutdown(ScheduledExecutorService executor) {

@@ -44,9 +44,9 @@ public interface HttpInvoker {
 
     @SneakyThrows
     static <T> T httpPost(String requestString,String url, Class<T> clazz) {
-        log.debug(" =====>>>>>> httpPost: " + url);
+        log.info(" =====>>>>>> httpPost: " + url);
         String respJson = Default.post(requestString, url);
-        log.debug(" =====>>>>>> response: " + respJson);
+        log.info(" =====>>>>>> response: " + respJson);
         return JSON.parseObject(respJson, clazz);
     }
 }
